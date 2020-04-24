@@ -25,21 +25,28 @@ import {get_strings} from 'core/str';
 import notification from 'core/notification';
 
 let wwwRoot,
-    chunkSize;
+    chunkSize,
+    elementId;
 
+let fileinput, filename, progress, progressicon;
 /**
  * Init function
  */
 export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize) {
-    const fileinput = $('#' + elementid + "_file");
+    fileinput = $('#' + elementid + "_file");
+    let parent = fileinput.next();
+    filename = parent.find('.chunkupload-filename');
+    progress = parent.find('.chunkupload-progress');
+    progressicon = parent.find('.chunkupload-icon');
     wwwRoot = wwwroot;
     chunkSize = chunksize;
+    elementId = elementid;
     fileinput.change(() => {
         let file = fileinput.get(0).files[0];
         let fileextension = ".";
         if (file.name.indexOf(".") !== -1) {
             let splits = file.name.split(".");
-            fileextension = splits[splits.length - 1];
+            fileextension = "." + splits[splits.length - 1];
         }
         if (!(acceptedTypes === '*' ||
             (acceptedTypes instanceof Array && acceptedTypes.indexOf(fileextension) !== -1))) {
@@ -51,6 +58,7 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize) {
             notifyError({key: 'errorpostmaxsize', component: 'core_repository'});
             return;
         }
+        filename.text(file.name);
         startUpload(file);
     });
 }
@@ -60,13 +68,15 @@ function startUpload(file) {
     let params = {
         start: 0,
         end: end,
-        length: file.size
+        length: file.size,
+        filename: file.name
     };
     let slice = file.slice(0, end);
     let xhr = new XMLHttpRequest();
     xhr.open('post', wwwRoot + "/local/chunkupload/startupload_ajax.php?" + $.param(params));
-    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-    xhr.send(slice);
+    xhr.upload.onprogress = (e) => {
+        setProgress(e.loaded, file.size);
+    };
     xhr.onreadystatechange = () => {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
@@ -76,11 +86,15 @@ function startUpload(file) {
                 } else {
                     if (end < file.size) {
                         proceedUpload(file, chunkSize, response.fid, response.continuetoken);
+                    } else {
+                        setFileId(response.fid);
                     }
                 }
             }
         }
     };
+    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+    xhr.send(slice);
 }
 
 function proceedUpload(file, start, fileid, continuetoken) {
@@ -94,8 +108,9 @@ function proceedUpload(file, start, fileid, continuetoken) {
     let slice = file.slice(start, end);
     let xhr = new XMLHttpRequest();
     xhr.open('post', wwwRoot + "/local/chunkupload/proceedupload_ajax.php?" + $.param(params));
-    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-    xhr.send(slice);
+    xhr.upload.onprogress = (e) => {
+        setProgress(e.loaded + start, file.size);
+    };
     xhr.onreadystatechange = () => {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
@@ -105,14 +120,35 @@ function proceedUpload(file, start, fileid, continuetoken) {
                 } else {
                     if (end < file.size) {
                         proceedUpload(file, end, fileid, response.continuetoken);
+                    } else {
+                        setFileId(fileid);
                     }
                 }
             }
         }
     };
+    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+    xhr.send(slice);
+}
+
+function reset() {
+    setProgress(0, 1);
+    setFileId(null);
+    filename.text("");
+}
+
+function setProgress(loaded, total) {
+    console.log(loaded, total);
+    progress.css('width', loaded * 100 / total + "%");
+    progressicon.prop('hidden', loaded !== total);
+}
+
+function setFileId(fileId) {
+    $('#' + elementId).val(fileId);
 }
 
 function notifyError(errorstring) {
+    reset();
     if (typeof errorstring === "string") {
         get_strings([
             {key: 'error'},

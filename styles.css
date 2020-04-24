@@ -1,0 +1,40 @@
+.custom-file-input ~ .custom-file-label.chunkupload-label {
+    padding: 0;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+}
+
+.custom-file-input ~ .custom-file-label.chunkupload-label:after {
+    display: none;
+}
+
+.chunkupload-label > span {
+    height: 100%;
+    text-align: center;
+    padding: .375rem .75rem;
+}
+
+.chunkupload-label .chunkupload-browse {
+    background-color: #e9ecef;
+    flex: 1 1 10%;
+}
+
+.chunkupload-label .chunkupload-left {
+    flex: 1 1 90%;
+    position: relative;
+}
+
+.chunkupload-label .chunkupload-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 6px;
+    background: #006784;
+}
+
+.chunkupload-label .chunkupload-icon {
+    color: green;
+}

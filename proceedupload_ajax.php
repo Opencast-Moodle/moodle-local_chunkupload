@@ -102,6 +102,7 @@ file_put_contents($path, $content, FILE_APPEND);
 $record->continuetoken = rand();
 $record->finished = $end == $length ? 1 : 0;
 $record->currentpos = $end;
+$record->lastmodified = time();
 
 $DB->update_record('local_chunkupload_files', $record);
 

@@ -38,6 +38,7 @@ $PAGE->set_context(context_system::instance());
 $length = optional_param("length", 0, PARAM_INT);
 $start = optional_param("start", null, PARAM_INT);
 $end = optional_param("end", null, PARAM_INT);
+$filename = optional_param("filename", null, PARAM_FILE);
 
 echo $OUTPUT->header();
 
@@ -67,6 +68,7 @@ $record->length = $length;
 $record->lastmodified = time();
 $record->continuetoken = rand();
 $record->finished = $end == $length ? 1 : 0;
+$record->filename = $filename;
 
 $DB->insert_record_raw('local_chunkupload_files', $record, false, false, true);
 file_put_contents($path, file_get_contents('php://input', false, null, 0, $end));

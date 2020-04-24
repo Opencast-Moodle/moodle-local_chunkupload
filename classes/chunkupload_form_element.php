@@ -26,7 +26,6 @@ namespace local_chunkupload;
 
 global $CFG;
 
-use context_user;
 use html_writer;
 use renderer_base;
 
@@ -104,7 +103,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
      * @return string
      */
     function toHtml() {
-        global $CFG, $COURSE, $USER, $PAGE, $OUTPUT;
+        global $CFG, $PAGE, $OUTPUT;
         $id = $this->_attributes['id'];
         $elname = $this->_attributes['name'];
 
@@ -112,19 +111,28 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             return $this->getFrozenHtml();
         }
 
+        $filenamestring = null;
+        if (is_numeric($value = $this->getValue())) {
+            global $DB;
+            if ($record = $DB->get_record('local_chunkupload_files', ['id' => $value])) {
+                $filenamestring = $record->filename;
+            }
+        }
+        if (!$filenamestring) {
+            $filenamestring = get_string('choosefile', 'mod_feedback');
+        }
+
         // need these three to filter repositories list
         $accepted_types = $this->_options['accepted_types'] ? $this->_options['accepted_types'] : '*';
 
-        $html = '<input type="hidden" name="' . $elname . '" id="' . $id . '" value="" class=""/>';
-        $html .= '<input type="file" id="' . $id . '_file" class="w-100"/>';//elementid, acceptedTypes, maxBytes, wwwroot, chunksize
-        $PAGE->requires->js_call_amd('local_chunkupload/chunkupload', 'init', array(
-                'elementid' => $id,
-                'acceptedTypes' => $accepted_types,
-                'maxBytes' => $this->_options['maxbytes'],
-                'wwwroot' => $CFG->wwwroot,
-                'chunksize' => 10000
-        ));
+        $context = [
+                'elid' => $id,
+                'elname' => $elname,
+                'value' => $this->getValue(),
+                'filenamestring' => $filenamestring
+        ];
 
+        $html = "";
         if (!empty($accepted_types) && $accepted_types != '*') {
             $html .= html_writer::tag('p', get_string('filesofthesetypes', 'form'));
             $util = new \core_form\filetypes_util();
@@ -132,7 +140,15 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             $filetypedescriptions = $util->describe_file_types($filetypes);
             $html .= $OUTPUT->render_from_template('core_form/filetypes-descriptions', $filetypedescriptions);
         }
+        $html .= $OUTPUT->render_from_template('local_chunkupload/filepicker', $context);
 
+        $PAGE->requires->js_call_amd('local_chunkupload/chunkupload', 'init', array(
+                'elementid' => $id,
+                'acceptedTypes' => $accepted_types,
+                'maxBytes' => $this->_options['maxbytes'],
+                'wwwroot' => $CFG->wwwroot,
+                'chunksize' => 100000
+        ));
         return $html;
     }
 
@@ -144,34 +160,12 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
      * @return array
      */
     function exportValue(&$submitValues, $assoc = false) {
-        global $USER;
-
-        $draftitemid = $this->_findValue($submitValues);
-        if (null === $draftitemid) {
-            $draftitemid = $this->getValue();
+        $fileid = $this->_findValue($submitValues);
+        if (null === $fileid) {
+            $fileid = $this->getValue();
         }
 
-        // make sure max one file is present and it is not too big
-        if (!is_null($draftitemid)) {
-            $fs = get_file_storage();
-            $usercontext = context_user::instance($USER->id);
-            if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id DESC', false)) {
-                $file = array_shift($files);
-                if ($this->_options['maxbytes']
-                        and $this->_options['maxbytes'] !== USER_CAN_IGNORE_FILE_SIZE_LIMITS
-                        and $file->get_filesize() > $this->_options['maxbytes']) {
-
-                    // bad luck, somebody tries to sneak in oversized file
-                    $file->delete();
-                }
-                foreach ($files as $file) {
-                    // only one file expected
-                    $file->delete();
-                }
-            }
-        }
-
-        return $this->_prepareValue($draftitemid, true);
+        return $this->_prepareValue($fileid, true);
     }
 
     public function export_for_template(renderer_base $output) {
@@ -187,5 +181,52 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             $path = "$CFG->dataroot/chunkupload/" . $id;
         } while (file_exists($path));
         return $id;
+    }
+
+    public static function get_path_for_id($id) {
+        global $CFG;
+        if (is_numeric($id)) {
+            return "$CFG->dataroot/chunkupload/" . $id;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Check that the file has the allowed type.
+     *
+     * @param array $value Draft item id with the uploaded files.
+     * @return string|null Validation error message or null.
+     */
+    public function validateSubmitValue($value) {
+        global $DB;
+        if (is_null($value)) {
+            return get_string('nofile', 'error');
+        }
+        $path = self::get_path_for_id($value);
+        if ($path == null || !file_exists($path)) {
+            return get_string('nofile', 'error');
+        }
+        if (filesize($path) > $this->_options['maxbytes']) {
+            unlink($path);
+            $DB->delete_records('local_chunkupload_files', ['id' => $value]);
+            return get_string('errorfiletoobig', $this->_options['maxbytes']);
+        }
+
+        $accepted_types = $this->_options['accepted_types'];
+
+        if (!((is_array($accepted_types) and in_array('*', $accepted_types)) or $accepted_types == '*')) {
+            $mimetypes = array();
+            foreach ($accepted_types as $type) {
+                $mimetypes[] = mimeinfo('type', $type);
+            }
+            $filetype = mime_content_type($path);
+            if (!in_array($filetype, $mimetypes)) {
+                unlink($path);
+                $DB->delete_records('local_chunkupload_files', ['id' => $value]);
+                return get_string('invalidfiletype', 'core_repository', $filetype);
+            }
+        }
+        return null;
     }
 }
