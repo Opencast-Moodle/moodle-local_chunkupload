@@ -138,7 +138,6 @@ function reset() {
 }
 
 function setProgress(loaded, total) {
-    console.log(loaded, total);
     progress.css('width', loaded * 100 / total + "%");
     progressicon.prop('hidden', loaded !== total);
 }
