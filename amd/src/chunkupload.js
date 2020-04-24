@@ -51,7 +51,7 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize) {
             notifyError({key: 'errorpostmaxsize', component: 'core_repository'});
             return;
         }
-        let result = startUpload(file);
+        startUpload(file);
     });
 }
 
@@ -62,25 +62,73 @@ function startUpload(file) {
         end: end,
         length: file.size
     };
-    let fileReader = new FileReader();
     let slice = file.slice(0, end);
-    fileReader.readAsText(slice);
-    fileReader.addEventListener('loadend', () => {
-        $.post(wwwRoot + "/local/chunkupload/startupload_ajax.php?" + $.param(params), fileReader.result,
-            (a, b) => {
-                console.log(a, b);
+    let xhr = new XMLHttpRequest();
+    xhr.open('post', wwwRoot + "/local/chunkupload/startupload_ajax.php?" + $.param(params));
+    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+    xhr.send(slice);
+    xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                let response = JSON.parse(xhr.responseText);
+                if (response.error !== undefined) {
+                    notifyError(response.error);
+                } else {
+                    if (end < file.size) {
+                        proceedUpload(file, chunkSize, response.fid, response.continuetoken);
+                    }
+                }
             }
-        );
-    });
+        }
+    };
+}
+
+function proceedUpload(file, start, fileid, continuetoken) {
+    let end = start + chunkSize < file.size ? start + chunkSize : file.size;
+    let params = {
+        start: start,
+        end: end,
+        continuetoken: continuetoken,
+        fileid: fileid
+    };
+    let slice = file.slice(start, end);
+    let xhr = new XMLHttpRequest();
+    xhr.open('post', wwwRoot + "/local/chunkupload/proceedupload_ajax.php?" + $.param(params));
+    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+    xhr.send(slice);
+    xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                let response = JSON.parse(xhr.responseText);
+                if (response.error !== undefined) {
+                    notifyError(response.error);
+                } else {
+                    if (end < file.size) {
+                        proceedUpload(file, end, fileid, response.continuetoken);
+                    }
+                }
+            }
+        }
+    };
 }
 
 function notifyError(errorstring) {
-    get_strings([
-        {key: 'error'},
-        errorstring,
-        {key: 'ok'},
-    ]).done(function(s) {
-            notification.alert(s[0], s[1], s[2]);
-        }
-    ).fail(notification.exception);
+    if (typeof errorstring === "string") {
+        get_strings([
+            {key: 'error'},
+            {key: 'ok'},
+        ]).done(function(s) {
+                notification.alert(s[0], errorstring, s[1]);
+            }
+        ).fail(notification.exception);
+    } else {
+        get_strings([
+            {key: 'error'},
+            errorstring,
+            {key: 'ok'},
+        ]).done(function(s) {
+                notification.alert(s[0], s[1], s[2]);
+            }
+        ).fail(notification.exception);
+    }
 }

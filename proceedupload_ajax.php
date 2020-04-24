@@ -32,8 +32,8 @@ require_login(null, false, null, false, true);
 
 $PAGE->set_context(context_system::instance());
 
-$fid = optional_param("fileid", 0, PARAM_INT);
-$continue = optional_param("continue", 0, PARAM_INT);
+$fid = optional_param("fileid", null, PARAM_INT);
+$continuetoken = optional_param("continuetoken", null, PARAM_INT);
 $start = optional_param("start", null, PARAM_INT);
 $end = optional_param("end", null, PARAM_INT);
 
@@ -51,44 +51,60 @@ if ($end === null) {
     die(json_encode($err));
 }
 
+if ($fid === null) {
+    $err->error = "Param fileid is missing";
+    die(json_encode($err));
+}
+
+if ($continuetoken === null) {
+    $err->error = "Param continuetoken is missing";
+    die(json_encode($err));
+}
+
 $record = $DB->get_record('local_chunkupload_files', ['id' => $fid]);
 
 if (!$record) {
-    die("...");
+    $err->error = "Record for given file does not exist.";
+    die(json_encode($err));
 }
 
-if ($record->continuetoken != $continue) {
-    die("...");
+if ($record->continuetoken != $continuetoken) {
+    $err->error = "Continuetoken is wrong.";
+    die(json_encode($err));
 }
 
 if ($record->currentpos != $start) {
-    $err->error = "Some bytes missing";
+    $err->error = "Filechunk does not begin, where last one left off.";
     die(json_encode($err));
 }
 
 if ($record->end > $record->length) {
-    die("...");
+    $err->error = "Filechunk is too long and exceeds the length of the whole file.";
+    die(json_encode($err));
 }
 
 $path = "$CFG->dataroot/chunkupload/" . $fid;
 
 if (!file_exists($path)) {
-    die("...");
+    $err->error = "Begin of file does not exist on this server.";
+    die(json_encode($err));
 }
 
 $content = file_get_contents('php://input', false, null, 0, $end - $start);
 
-if (!strlen($content) != $end - $start) {
-    die("...");
+if (strlen($content) != $end - $start) {
+    $err->error = "Filechunk is not as long as it should be.";
+    die(json_encode($err));
 }
 
 file_put_contents($path, $content, FILE_APPEND);
 
 $record->continuetoken = rand();
-// $record->finished = $end == $length;
+$record->finished = $end == $length ? 1 : 0;
+$record->currentpos = $end;
 
 $DB->update_record('local_chunkupload_files', $record);
 
 $response = new stdClass();
-$response->continue = $record->continuetoken;
+$response->continuetoken = $record->continuetoken;
 die(json_encode($response));

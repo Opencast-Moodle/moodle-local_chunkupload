@@ -66,11 +66,11 @@ $record->currentpos = $end;
 $record->length = $length;
 $record->lastmodified = time();
 $record->continuetoken = rand();
+$record->finished = $end == $length ? 1 : 0;
 
 $DB->insert_record_raw('local_chunkupload_files', $record, false, false, true);
-
 file_put_contents($path, file_get_contents('php://input', false, null, 0, $end));
 $response = new stdClass();
 $response->fid = $id;
-$response->continue = $record->continuetoken;
+$response->continuetoken = $record->continuetoken;
 die(json_encode($response));

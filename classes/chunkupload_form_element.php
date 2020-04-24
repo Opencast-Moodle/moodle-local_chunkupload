@@ -122,7 +122,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
                 'acceptedTypes' => $accepted_types,
                 'maxBytes' => $this->_options['maxbytes'],
                 'wwwroot' => $CFG->wwwroot,
-                'chunksize' => 100000
+                'chunksize' => 10000
         ));
 
         if (!empty($accepted_types) && $accepted_types != '*') {
@@ -183,7 +183,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
     public static function get_unused_chunkupload_id() {
         global $CFG;
         do {
-            $id = rand(0, 1000000);
+            $id = rand();
             $path = "$CFG->dataroot/chunkupload/" . $id;
         } while (file_exists($path));
         return $id;
