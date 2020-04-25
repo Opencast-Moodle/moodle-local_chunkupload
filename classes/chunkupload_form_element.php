@@ -142,12 +142,13 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         }
         $html .= $OUTPUT->render_from_template('local_chunkupload/filepicker', $context);
 
+
         $PAGE->requires->js_call_amd('local_chunkupload/chunkupload', 'init', array(
                 'elementid' => $id,
                 'acceptedTypes' => $accepted_types,
                 'maxBytes' => $this->_options['maxbytes'],
                 'wwwroot' => $CFG->wwwroot,
-                'chunksize' => 100000
+                'chunksize' => get_config('local_chunkupload', 'chunksize') * 1024 * 1024
         ));
         return $html;
     }

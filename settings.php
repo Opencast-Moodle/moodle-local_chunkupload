@@ -15,12 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for plugin 'local_chunkupload'
+ * Chunkupload settings.
  *
- * @package   local_chunkupload
- * @copyright 2020 Justus Dieckmann WWU
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    local_chunkupload
+ * @copyright  2020 Justus Dieckmann WWU
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
+global $ADMIN;
 
-$string['pluginname'] = 'Chunkupload';
-$string['setting:chunksize'] = 'Chunksize (MB)';
+if ($hassiteconfig) {
+    $settings = new admin_settingpage('local_chunkupload', get_string('pluginname', 'local_chunkupload'));
+    $settings->add(new admin_setting_configtext('local_chunkupload/chunksize',
+            new lang_string('setting:chunksize', 'local_chunkupload'), null, 64, PARAM_INT));
+    $ADMIN->add('localplugins', $settings);
+}
