@@ -132,7 +132,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
                 'filenamestring' => $filenamestring
         ];
 
-        $html = "";
+        $html = $OUTPUT->render_from_template('local_chunkupload/filepicker', $context);
         if (!empty($accepted_types) && $accepted_types != '*') {
             $html .= html_writer::tag('p', get_string('filesofthesetypes', 'form'));
             $util = new \core_form\filetypes_util();
@@ -140,8 +140,6 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             $filetypedescriptions = $util->describe_file_types($filetypes);
             $html .= $OUTPUT->render_from_template('core_form/filetypes-descriptions', $filetypedescriptions);
         }
-        $html .= $OUTPUT->render_from_template('local_chunkupload/filepicker', $context);
-
 
         $PAGE->requires->js_call_amd('local_chunkupload/chunkupload', 'init', array(
                 'elementid' => $id,

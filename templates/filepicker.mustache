@@ -22,6 +22,7 @@
 <div class="custom-file">
     <input type="file" class="custom-file-input" id="{{elid}}_file">
     <label class="custom-file-label chunkupload-label" for="{{elid}}_file">
+        <span class="chunkupload-browse btn-secondary">{{#str}}browse, core_editor{{/str}}</span>
         <span class="chunkupload-left">
             <span class="chunkupload-icon" {{^value}}hidden{{/value}}>
                 {{#pix}}i/checked, core,{{/pix}}
@@ -29,6 +30,5 @@
             <span class="chunkupload-filename">{{filenamestring}}</span>
             <span class="chunkupload-progress"></span>
         </span>
-        <span class="chunkupload-browse">{{#str}}browse, core_editor{{/str}}</span>
     </label>
 </div>

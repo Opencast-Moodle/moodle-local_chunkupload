@@ -138,7 +138,12 @@ function reset() {
 }
 
 function setProgress(loaded, total) {
-    progress.css('width', loaded * 100 / total + "%");
+    if (loaded === total) {
+        // Hide progressbar on finish.
+        progress.css('width', '0');
+    } else {
+        progress.css('width', loaded * 100 / total + "%");
+    }
     progressicon.prop('hidden', loaded !== total);
 }
 

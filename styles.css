@@ -18,7 +18,6 @@
 }
 
 .chunkupload-label .chunkupload-browse {
-    background-color: #e9ecef;
     flex: 1 1 20%;
 }
 
@@ -34,7 +33,7 @@
     bottom: 0;
     left: 0;
     height: 6px;
-    background: #006784;
+    background: #578014;
 }
 
 .chunkupload-label .chunkupload-icon {
