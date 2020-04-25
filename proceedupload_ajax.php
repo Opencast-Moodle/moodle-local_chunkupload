@@ -100,7 +100,7 @@ if (strlen($content) != $end - $start) {
 file_put_contents($path, $content, FILE_APPEND);
 
 $record->continuetoken = rand();
-$record->finished = $end == $length ? 1 : 0;
+$record->finished = $end == $record->length ? 1 : 0;
 $record->currentpos = $end;
 $record->lastmodified = time();
 

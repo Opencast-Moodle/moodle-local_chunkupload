@@ -42,6 +42,7 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize) {
     chunkSize = chunksize;
     elementId = elementid;
     fileinput.change(() => {
+        reset();
         let file = fileinput.get(0).files[0];
         let fileextension = ".";
         if (file.name.indexOf(".") !== -1) {
@@ -133,7 +134,7 @@ function proceedUpload(file, start, fileid, continuetoken) {
 
 function reset() {
     setProgress(0, 1);
-    setFileId(null);
+    setFileId("");
     filename.text("");
 }
 
