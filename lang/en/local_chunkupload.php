@@ -24,4 +24,9 @@
 
 $string['pluginname'] = 'Chunkupload';
 $string['setting:chunksize'] = 'Chunksize (MB)';
+$string['setting:state0duration'] = 'Duration until unused token is deleted';
+$string['setting:state1duration'] = 'Duration until uncompleted fileupload is deleted';
+$string['setting:state2duration'] = 'Duration until completed fileupload is deleted';
+$string['cleanup_task'] = 'Task to cleanup old tokens and files';
+
 $string['uploadnotfinished'] = 'Upload did not finish!';

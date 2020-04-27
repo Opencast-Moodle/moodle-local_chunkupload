@@ -27,6 +27,16 @@ global $ADMIN;
 if ($hassiteconfig) {
     $settings = new admin_settingpage('local_chunkupload', get_string('pluginname', 'local_chunkupload'));
     $settings->add(new admin_setting_configtext('local_chunkupload/chunksize',
-            new lang_string('setting:chunksize', 'local_chunkupload'), null, 64, PARAM_INT));
+            new lang_string('setting:chunksize', 'local_chunkupload'),
+            null, 64, PARAM_INT));
+    $settings->add(new admin_setting_configduration('local_chunkupload/state0duration',
+            new lang_string('setting:state0duration', 'local_chunkupload'),
+            null, 3600, 3600));
+    $settings->add(new admin_setting_configduration('local_chunkupload/state1duration',
+            new lang_string('setting:state1duration', 'local_chunkupload'),
+            null, 3600, 3600));
+    $settings->add(new admin_setting_configduration('local_chunkupload/state2duration',
+            new lang_string('setting:state2duration', 'local_chunkupload'),
+            null, 86400, 86400));
     $ADMIN->add('localplugins', $settings);
 }

@@ -125,6 +125,11 @@ function proceedUpload(file, start) {
             }
         }
     };
+    xhr.onerror = () => {
+        reset();
+        // Doesn't make sense to try to fetch strings when having internet problems.
+        notification.alert("Error", "Failure while uploading!", "Ok");
+    };
     xhr.setRequestHeader('Content-Type', 'application/octet-stream');
     xhr.send(slice);
 }

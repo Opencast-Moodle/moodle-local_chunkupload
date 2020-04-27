@@ -15,15 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Definition of local_chunkupload cleanup task.
  *
  * @package   local_chunkupload
- * @copyright 2020 Justus Dieckmann WWU
+ * @copyright 2020 Justus Dieckmann
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020042700;      // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2019111200;      // Requires this Moodle version
-$plugin->component = 'local_chunkupload'; // Full name of the plugin (used for diagnostics).
+/* List of handlers */
+
+$tasks = array(
+    array(
+        'classname' => 'local_chunkupload\task\cleanup_files',
+        'blocking' => 0,
+        'minute' => 'R',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ),
+);
