@@ -30,8 +30,14 @@ let wwwRoot,
 let fileinput, filename, progress, progressicon;
 
 let token;
+
 /**
- * Init function
+ * Init
+ * @param {String} elementid string The id of the input element
+ * @param {String} acceptedTypes The accepted Types
+ * @param {int} maxBytes The maximal allowed amount of bytes
+ * @param {string} wwwroot The wwwroot
+ * @param {int} chunksize The chunksize in bytes
  */
 export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize) {
     fileinput = $('#' + elementid + "_file");
@@ -65,6 +71,10 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize) {
     });
 }
 
+/**
+ * Start the Upload
+ * @param {File} file The File to upload.
+ */
 function startUpload(file) {
     let end = chunkSize < file.size ? chunkSize : file.size;
     let params = {
@@ -98,6 +108,11 @@ function startUpload(file) {
     xhr.send(slice);
 }
 
+/**
+ * Proceed the upload
+ * @param {File} file
+ * @param {int} start from where to proceed the upload.
+ */
 function proceedUpload(file, start) {
     let end = start + chunkSize < file.size ? start + chunkSize : file.size;
     let params = {
@@ -134,11 +149,19 @@ function proceedUpload(file, start) {
     xhr.send(slice);
 }
 
+/**
+ * Resets the Progress and the Filepicker name.
+ */
 function reset() {
     setProgress(0, 1);
     filename.text("");
 }
 
+/**
+ * Sets the progressbar
+ * @param {int} loaded
+ * @param {int} total
+ */
 function setProgress(loaded, total) {
     if (loaded === total) {
         // Hide progressbar on finish.
@@ -149,6 +172,10 @@ function setProgress(loaded, total) {
     progressicon.prop('hidden', loaded !== total);
 }
 
+/**
+ * Notify error
+ * @param {object|string} errorstring Either Object as accepted by get_string, or a string, to describe the error.
+ */
 function notifyError(errorstring) {
     reset();
     if (typeof errorstring === "string") {

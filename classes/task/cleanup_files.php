@@ -43,8 +43,6 @@ class cleanup_files extends \core\task\scheduled_task {
         global $DB;
         $config = get_config('local_chunkupload');
 
-        var_dump($config);
-
         // State 0
         $DB->delete_records_select('local_chunkupload_files', 'state = 0 AND lastmodified < :time',
                 array('time' => time() - $config->state0duration));
@@ -53,14 +51,10 @@ class cleanup_files extends \core\task\scheduled_task {
         $ids = $DB->get_fieldset_select('local_chunkupload_files', 'id',
                 'lastmodified < :time AND state = 1', array('time' => time() - $config->state1duration));
         $DB->delete_records_list('local_chunkupload_files', 'id', $ids);
-        echo "State 1:";//#############
-        var_dump($ids);//#############
         foreach ($ids as $id) {
             $path = chunkupload_form_element::get_path_for_id($id);
             if (file_exists($path)) {
                 unlink($path);
-            } else {
-                var_dump($path);//#############
             }
         }
 
@@ -68,14 +62,10 @@ class cleanup_files extends \core\task\scheduled_task {
         $ids = $DB->get_fieldset_select('local_chunkupload_files', 'id',
                 'lastmodified < :time AND state = 2', array('time' => time() - $config->state2duration));
         $DB->delete_records_list('local_chunkupload_files', 'id', $ids);
-        echo "State 2:";//#############
-        var_dump($ids);//#############
         foreach ($ids as $id) {
             $path = chunkupload_form_element::get_path_for_id($id);
             if (file_exists($path)) {
                 unlink($path);
-            } else {
-                var_dump($path);//#############
             }
         }
     }
