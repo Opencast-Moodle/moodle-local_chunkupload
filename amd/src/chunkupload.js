@@ -88,7 +88,7 @@ function startUpload(file) {
                     notifyError(response.error);
                 } else {
                     if (end < file.size) {
-                        proceedUpload(file, chunkSize, response.continuetoken);
+                        proceedUpload(file, chunkSize);
                     }
                 }
             }
@@ -98,12 +98,11 @@ function startUpload(file) {
     xhr.send(slice);
 }
 
-function proceedUpload(file, start, continuetoken) {
+function proceedUpload(file, start) {
     let end = start + chunkSize < file.size ? start + chunkSize : file.size;
     let params = {
         start: start,
         end: end,
-        continuetoken: continuetoken,
         id: token
     };
     let slice = file.slice(start, end);
@@ -120,7 +119,7 @@ function proceedUpload(file, start, continuetoken) {
                     notifyError(response.error);
                 } else {
                     if (end < file.size) {
-                        proceedUpload(file, end, response.continuetoken);
+                        proceedUpload(file, end);
                     }
                 }
             }

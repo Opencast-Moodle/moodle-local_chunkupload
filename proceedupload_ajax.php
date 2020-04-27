@@ -29,7 +29,6 @@ require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/../../lib/filelib.php');
 
 $id = optional_param("id", null, PARAM_ALPHANUM);
-$continuetoken = optional_param("continuetoken", null, PARAM_INT);
 $start = optional_param("start", null, PARAM_INT);
 $end = optional_param("end", null, PARAM_INT);
 
@@ -71,11 +70,6 @@ if ($end === null) {
     die(json_encode($err));
 }
 
-if ($continuetoken === null) {
-    $err->error = "Param continuetoken is missing";
-    die(json_encode($err));
-}
-
 $record = $DB->get_record('local_chunkupload_files', ['id' => $id]);
 
 if (!$record) {
@@ -90,11 +84,6 @@ if ($USER->id != $record->userid) {
 
 if ($record->state != 1) {
     $err->error = "File is in state $record->state, unable to proceed upload!";
-    die(json_encode($err));
-}
-
-if ($record->continuetoken != $continuetoken) {
-    $err->error = "Continuetoken is wrong.";
     die(json_encode($err));
 }
 
@@ -124,7 +113,6 @@ if (strlen($content) != $end - $start) {
 
 file_put_contents($path, $content, FILE_APPEND);
 
-$record->continuetoken = rand();
 $record->state = $end == $record->length ? 2 : 1;
 $record->currentpos = $end;
 $record->lastmodified = time();
@@ -132,5 +120,4 @@ $record->lastmodified = time();
 $DB->update_record('local_chunkupload_files', $record);
 
 $response = new stdClass();
-$response->continuetoken = $record->continuetoken;
 die(json_encode($response));
