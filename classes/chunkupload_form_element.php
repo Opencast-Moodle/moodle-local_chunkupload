@@ -245,6 +245,11 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         return $id;
     }
 
+    public static function get_base_folder() {
+        global $CFG;
+        return "$CFG->dataroot/chunkupload/";
+    }
+
     public static function get_path_for_id($id) {
         global $CFG;
         if ($id) {

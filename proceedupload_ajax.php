@@ -111,6 +111,9 @@ if (strlen($content) != $end - $start) {
     die(json_encode($err));
 }
 
+if (!file_exists($path = \local_chunkupload\chunkupload_form_element::get_base_folder())) {
+    mkdir($path);
+}
 file_put_contents($path, $content, FILE_APPEND);
 
 $record->state = $end == $record->length ? 2 : 1;

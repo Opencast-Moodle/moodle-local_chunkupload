@@ -62,9 +62,7 @@ echo $OUTPUT->header();
 \local_chunkupload\login_helper::require_login_in_context_ajax($context);
 
 if ($USER->id != $record->userid) {
-
     $err->error = "Request was made by a different user!";
-    $err->debug = var_export($record);
     die(json_encode($err));
 }
 
@@ -94,6 +92,16 @@ if ($end > $length) {
 }
 
 $path = \local_chunkupload\chunkupload_form_element::get_path_for_id($id);
+$content = file_get_contents('php://input', false, null, 0, $end);
+if (strlen($content) != $end) {
+    $err->error = "Filechunk is not as long as it should be.";
+    die(json_encode($err));
+}
+
+if (!file_exists($dirpath = \local_chunkupload\chunkupload_form_element::get_base_folder())) {
+    mkdir($dirpath);
+}
+file_put_contents($path, $content);
 
 $record->currentpos = $end;
 $record->length = $length;
@@ -101,6 +109,6 @@ $record->lastmodified = time();
 $record->state = $end == $length ? 2 : 1;
 $record->filename = $filename;
 $DB->update_record('local_chunkupload_files', $record);
-file_put_contents($path, file_get_contents('php://input', false, null, 0, $end));
+
 $response = new stdClass();
 die(json_encode($response));
