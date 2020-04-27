@@ -24,3 +24,4 @@
 
 $string['pluginname'] = 'Chunkupload';
 $string['setting:chunksize'] = 'Chunksize (MB)';
+$string['uploadnotfinished'] = 'Upload did not finish!';

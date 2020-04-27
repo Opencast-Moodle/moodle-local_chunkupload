@@ -28,18 +28,38 @@ define('AJAX_SCRIPT', true);
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/../../lib/filelib.php');
 
-require_login(null, false, null, false, true);
-
-$PAGE->set_context(context_system::instance());
-
-$fid = optional_param("fileid", null, PARAM_INT);
+$id = optional_param("id", null, PARAM_ALPHANUM);
 $continuetoken = optional_param("continuetoken", null, PARAM_INT);
 $start = optional_param("start", null, PARAM_INT);
 $end = optional_param("end", null, PARAM_INT);
 
-echo $OUTPUT->header();
-
 $err = new stdClass();
+if (!$id) {
+    $PAGE->set_context(context_system::instance());
+    echo $OUTPUT->header();
+    $err->error = "Parameter id is missing.";
+    die(json_encode($err));
+}
+
+$record = $DB->get_record('local_chunkupload_files', ['id' => $id]);
+if (!$record) {
+    $PAGE->set_context(context_system::instance());
+    echo $OUTPUT->header();
+    $err->error = "No record with that id found.";
+    die(json_encode($err));
+}
+
+$context = context::instance_by_id($record->contextid, IGNORE_MISSING);
+if (!$context) {
+    $PAGE->set_context(context_system::instance());
+    echo $OUTPUT->header();
+    $err->error = "Context for that id not found.";
+    die(json_encode($err));
+}
+
+$PAGE->set_context($context);
+echo $OUTPUT->header();
+\local_chunkupload\login_helper::require_login_in_context_ajax($context);
 
 if ($start === null) {
     $err->error = "Param start is missing";
@@ -51,20 +71,25 @@ if ($end === null) {
     die(json_encode($err));
 }
 
-if ($fid === null) {
-    $err->error = "Param fileid is missing";
-    die(json_encode($err));
-}
-
 if ($continuetoken === null) {
     $err->error = "Param continuetoken is missing";
     die(json_encode($err));
 }
 
-$record = $DB->get_record('local_chunkupload_files', ['id' => $fid]);
+$record = $DB->get_record('local_chunkupload_files', ['id' => $id]);
 
 if (!$record) {
     $err->error = "Record for given file does not exist.";
+    die(json_encode($err));
+}
+
+if ($USER->id != $record->userid) {
+    $err->error = "Request was made by a different user!";
+    die(json_encode($err));
+}
+
+if ($record->state != 1) {
+    $err->error = "File is in state $record->state, unable to proceed upload!";
     die(json_encode($err));
 }
 
@@ -83,7 +108,7 @@ if ($record->end > $record->length) {
     die(json_encode($err));
 }
 
-$path = "$CFG->dataroot/chunkupload/" . $fid;
+$path = "$CFG->dataroot/chunkupload/" . $id;
 
 if (!file_exists($path)) {
     $err->error = "Begin of file does not exist on this server.";
@@ -100,7 +125,7 @@ if (strlen($content) != $end - $start) {
 file_put_contents($path, $content, FILE_APPEND);
 
 $record->continuetoken = rand();
-$record->finished = $end == $record->length ? 1 : 0;
+$record->state = $end == $record->length ? 2 : 1;
 $record->currentpos = $end;
 $record->lastmodified = time();
 

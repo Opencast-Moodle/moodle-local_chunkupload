@@ -25,22 +25,23 @@ import {get_strings} from 'core/str';
 import notification from 'core/notification';
 
 let wwwRoot,
-    chunkSize,
-    elementId;
+    chunkSize;
 
 let fileinput, filename, progress, progressicon;
+
+let token;
 /**
  * Init function
  */
 export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize) {
     fileinput = $('#' + elementid + "_file");
+    token = $('#' + elementid).val();
     let parent = fileinput.next();
     filename = parent.find('.chunkupload-filename');
     progress = parent.find('.chunkupload-progress');
     progressicon = parent.find('.chunkupload-icon');
     wwwRoot = wwwroot;
     chunkSize = chunksize;
-    elementId = elementid;
     fileinput.change(() => {
         reset();
         let file = fileinput.get(0).files[0];
@@ -70,7 +71,8 @@ function startUpload(file) {
         start: 0,
         end: end,
         length: file.size,
-        filename: file.name
+        filename: file.name,
+        id: token
     };
     let slice = file.slice(0, end);
     let xhr = new XMLHttpRequest();
@@ -86,9 +88,7 @@ function startUpload(file) {
                     notifyError(response.error);
                 } else {
                     if (end < file.size) {
-                        proceedUpload(file, chunkSize, response.fid, response.continuetoken);
-                    } else {
-                        setFileId(response.fid);
+                        proceedUpload(file, chunkSize, response.continuetoken);
                     }
                 }
             }
@@ -98,13 +98,13 @@ function startUpload(file) {
     xhr.send(slice);
 }
 
-function proceedUpload(file, start, fileid, continuetoken) {
+function proceedUpload(file, start, continuetoken) {
     let end = start + chunkSize < file.size ? start + chunkSize : file.size;
     let params = {
         start: start,
         end: end,
         continuetoken: continuetoken,
-        fileid: fileid
+        id: token
     };
     let slice = file.slice(start, end);
     let xhr = new XMLHttpRequest();
@@ -120,9 +120,7 @@ function proceedUpload(file, start, fileid, continuetoken) {
                     notifyError(response.error);
                 } else {
                     if (end < file.size) {
-                        proceedUpload(file, end, fileid, response.continuetoken);
-                    } else {
-                        setFileId(fileid);
+                        proceedUpload(file, end, response.continuetoken);
                     }
                 }
             }
@@ -134,7 +132,6 @@ function proceedUpload(file, start, fileid, continuetoken) {
 
 function reset() {
     setProgress(0, 1);
-    setFileId("");
     filename.text("");
 }
 
@@ -146,10 +143,6 @@ function setProgress(loaded, total) {
         progress.css('width', loaded * 100 / total + "%");
     }
     progressicon.prop('hidden', loaded !== total);
-}
-
-function setFileId(fileId) {
-    $('#' + elementId).val(fileId);
 }
 
 function notifyError(errorstring) {

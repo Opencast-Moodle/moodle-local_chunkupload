@@ -30,6 +30,7 @@ use html_writer;
 use renderer_base;
 
 require_once($CFG->dirroot . '/repository/lib.php');
+require_once($CFG->dirroot . '/question/editlib.php');
 require_once($CFG->libdir . "/pear/HTML/QuickForm/button.php");
 require_once($CFG->libdir . '/form/templatable_form_element.php');
 
@@ -106,33 +107,36 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         global $CFG, $PAGE, $OUTPUT;
         $id = $this->_attributes['id'];
         $elname = $this->_attributes['name'];
-
-        if ($this->_flagFrozen) {
-            return $this->getFrozenHtml();
-        }
-
+        $showfinishedicon = false;
         $filenamestring = null;
-        if (is_numeric($value = $this->getValue())) {
+
+        if ($value = $this->getValue()) {
             global $DB;
             if ($record = $DB->get_record('local_chunkupload_files', ['id' => $value])) {
-                $filenamestring = $record->filename;
+                if ($record->state == 2) {
+                    $filenamestring = $record->filename;
+                    $showfinishedicon = true;
+                }
             }
+        } else {
+            $value = $this->create_token();
         }
         if (!$filenamestring) {
             $filenamestring = get_string('choosefile', 'mod_feedback');
         }
 
-        // need these three to filter repositories list
-        $accepted_types = $this->_options['accepted_types'] ? $this->_options['accepted_types'] : '*';
-
         $context = [
                 'elid' => $id,
                 'elname' => $elname,
-                'value' => $this->getValue(),
-                'filenamestring' => $filenamestring
+                'value' => $value,
+                'filenamestring' => $filenamestring,
+                'showicon' => $showfinishedicon
         ];
 
         $html = $OUTPUT->render_from_template('local_chunkupload/filepicker', $context);
+
+        // need these three to filter repositories list
+        $accepted_types = $this->_options['accepted_types'] ? $this->_options['accepted_types'] : '*';
         if (!empty($accepted_types) && $accepted_types != '*') {
             $html .= html_writer::tag('p', get_string('filesofthesetypes', 'form'));
             $util = new \core_form\filetypes_util();
@@ -173,23 +177,6 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         return $context;
     }
 
-    public static function get_unused_chunkupload_id() {
-        global $CFG;
-        do {
-            $id = rand();
-            $path = "$CFG->dataroot/chunkupload/" . $id;
-        } while (file_exists($path));
-        return $id;
-    }
-
-    public static function get_path_for_id($id) {
-        global $CFG;
-        if (is_numeric($id)) {
-            return "$CFG->dataroot/chunkupload/" . $id;
-        } else {
-            return null;
-        }
-    }
 
     /**
      * Check that the file has the allowed type.
@@ -201,6 +188,13 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         global $DB;
         if (is_null($value)) {
             return get_string('nofile', 'error');
+        }
+        $record = $DB->get_record('local_chunkupload_files', ['id' => $value]);
+        if (!$record) {
+            return get_string('nofile', 'error');
+        }
+        if ($record->state != 2) {
+            return get_string('uploadnotfinished','local_chunkupload');
         }
         $path = self::get_path_for_id($value);
         if ($path == null || !file_exists($path)) {
@@ -227,5 +221,36 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             }
         }
         return null;
+    }
+
+    public function create_token() {
+        global $DB, $PAGE, $USER;
+
+        if ($USER->id == 0) {
+            // Ensure guests can't upload.
+            return null;
+        }
+
+        do {
+            $id = random_string(15);
+        } while ($DB->record_exists('local_chunkupload_files', ['id' => $id]));
+
+        $record = new \stdClass();
+        $record->id = $id;
+        $record->userid = $USER->id;
+        $record->contextid = $PAGE->context->id;
+        $record->maxlength = $this->_options['maxbytes'];
+        $record->lastmodified = time();
+        $DB->insert_record_raw('local_chunkupload_files', $record, false, false, true);
+        return $id;
+    }
+
+    public static function get_path_for_id($id) {
+        global $CFG;
+        if ($id) {
+            return "$CFG->dataroot/chunkupload/" . $id;
+        } else {
+            return null;
+        }
     }
 }

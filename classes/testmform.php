@@ -45,7 +45,7 @@ class testmform extends \moodleform {
                 'local_chunkupload\chunkupload_form_element');
 
         $mform->addElement('chunkupload', 'fileid', get_string('file'), null,
-                array('maxbytes' => 1000000000, 'accepted_types' => array('.mp4')));
+                array('maxbytes' => 100 * 1024 * 1024, 'accepted_types' => array('.mp4')));
 
         //$mform->addElement('text', 'textarea', 'YEAH!');
 

@@ -23,26 +23,51 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_chunkupload\chunkupload_form_element;
-
 define('AJAX_SCRIPT', true);
 
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/../../lib/filelib.php');
 
-require_login(null, false, null, false, true);
-
-$PAGE->set_context(context_system::instance());
-
-
-$length = optional_param("length", 0, PARAM_INT);
+$id = optional_param("id", null, PARAM_ALPHANUM);
 $start = optional_param("start", null, PARAM_INT);
+$length = optional_param("length", 0, PARAM_INT);
 $end = optional_param("end", null, PARAM_INT);
 $filename = optional_param("filename", null, PARAM_FILE);
 
-echo $OUTPUT->header();
-
 $err = new stdClass();
+if (!$id) {
+    $PAGE->set_context(context_system::instance());
+    echo $OUTPUT->header();
+    $err->error = "Parameter id is missing.";
+    die(json_encode($err));
+}
+
+$record = $DB->get_record('local_chunkupload_files', ['id' => $id]);
+if (!$record) {
+    $PAGE->set_context(context_system::instance());
+    echo $OUTPUT->header();
+    $err->error = "No record with that id found.";
+    die(json_encode($err));
+}
+
+$context = context::instance_by_id($record->contextid, IGNORE_MISSING);
+if (!$context) {
+    $PAGE->set_context(context_system::instance());
+    echo $OUTPUT->header();
+    $err->error = "Context for that id not found.";
+    die(json_encode($err));
+}
+$PAGE->set_context($context);
+echo $OUTPUT->header();
+\local_chunkupload\login_helper::require_login_in_context_ajax($context);
+
+if ($USER->id != $record->userid) {
+
+    $err->error = "Request was made by a different user!";
+    $err->debug = var_export($record);
+    die(json_encode($err));
+}
+
 if ($length == 0) {
     $err->error = "Must not be emtpy!";
     die(json_encode($err));
@@ -58,21 +83,26 @@ if ($end === null) {
     die(json_encode($err));
 }
 
-$id = chunkupload_form_element::get_unused_chunkupload_id();
-$path = "$CFG->dataroot/chunkupload/" . $id;
+if ($length > $record->maxlength) {
+    $err->error = "File is too long";
+    die(json_encode($err));
+}
 
-$record = new stdClass();
-$record->id = $id;
+if ($end > $length) {
+    $err->error = "Chunk is longer than specified length";
+    die(json_encode($err));
+}
+
+$path = \local_chunkupload\chunkupload_form_element::get_path_for_id($id);
+
 $record->currentpos = $end;
 $record->length = $length;
 $record->lastmodified = time();
 $record->continuetoken = rand();
-$record->finished = $end == $length ? 1 : 0;
+$record->state = $end == $length ? 2 : 1;
 $record->filename = $filename;
-
-$DB->insert_record_raw('local_chunkupload_files', $record, false, false, true);
+$DB->update_record('local_chunkupload_files', $record);
 file_put_contents($path, file_get_contents('php://input', false, null, 0, $end));
 $response = new stdClass();
-$response->fid = $id;
 $response->continuetoken = $record->continuetoken;
 die(json_encode($response));
