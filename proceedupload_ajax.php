@@ -97,7 +97,7 @@ if ($record->end > $record->length) {
     die(json_encode($err));
 }
 
-$path = "$CFG->dataroot/chunkupload/" . $id;
+$path = \local_chunkupload\chunkupload_form_element::get_path_for_id($id);
 
 if (!file_exists($path)) {
     $err->error = "Begin of file does not exist on this server.";
@@ -111,9 +111,6 @@ if (strlen($content) != $end - $start) {
     die(json_encode($err));
 }
 
-if (!file_exists($path = \local_chunkupload\chunkupload_form_element::get_base_folder())) {
-    mkdir($path);
-}
 file_put_contents($path, $content, FILE_APPEND);
 
 $record->state = $end == $record->length ? 2 : 1;
