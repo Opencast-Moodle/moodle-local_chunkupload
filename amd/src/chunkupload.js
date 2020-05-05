@@ -24,13 +24,6 @@ import $ from 'jquery';
 import {get_strings} from 'core/str';
 import notification from 'core/notification';
 
-let wwwRoot,
-    chunkSize;
-
-let fileinput, filename, progress, progressicon;
-
-let token;
-
 /**
  * Init
  * @param {String} elementid string The id of the input element
@@ -40,6 +33,13 @@ let token;
  * @param {int} chunksize The chunksize in bytes
  */
 export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize) {
+    let wwwRoot,
+        chunkSize;
+
+    let fileinput, filename, progress, progressicon;
+
+    let token;
+
     fileinput = $('#' + elementid + "_file");
     token = $('#' + elementid).val();
     let parent = fileinput.next();
@@ -69,131 +69,131 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize) {
         filename.text(file.name);
         startUpload(file);
     });
-}
 
-/**
- * Start the Upload
- * @param {File} file The File to upload.
- */
-function startUpload(file) {
-    let end = chunkSize < file.size ? chunkSize : file.size;
-    let params = {
-        start: 0,
-        end: end,
-        length: file.size,
-        filename: file.name,
-        id: token
-    };
-    let slice = file.slice(0, end);
-    let xhr = new XMLHttpRequest();
-    xhr.open('post', wwwRoot + "/local/chunkupload/startupload_ajax.php?" + $.param(params));
-    xhr.upload.onprogress = (e) => {
-        setProgress(e.loaded, file.size);
-    };
-    xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                let response = JSON.parse(xhr.responseText);
-                if (response.error !== undefined) {
-                    notifyError(response.error);
-                } else {
-                    if (end < file.size) {
-                        proceedUpload(file, chunkSize);
+    /**
+     * Start the Upload
+     * @param {File} file The File to upload.
+     */
+    function startUpload(file) {
+        let end = chunkSize < file.size ? chunkSize : file.size;
+        let params = {
+            start: 0,
+            end: end,
+            length: file.size,
+            filename: file.name,
+            id: token
+        };
+        let slice = file.slice(0, end);
+        let xhr = new XMLHttpRequest();
+        xhr.open('post', wwwRoot + "/local/chunkupload/startupload_ajax.php?" + $.param(params));
+        xhr.upload.onprogress = (e) => {
+            setProgress(e.loaded, file.size);
+        };
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    let response = JSON.parse(xhr.responseText);
+                    if (response.error !== undefined) {
+                        notifyError(response.error);
+                    } else {
+                        if (end < file.size) {
+                            proceedUpload(file, chunkSize);
+                        }
                     }
                 }
             }
-        }
-    };
-    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-    xhr.send(slice);
-}
-
-/**
- * Proceed the upload
- * @param {File} file
- * @param {int} start from where to proceed the upload.
- */
-function proceedUpload(file, start) {
-    let end = start + chunkSize < file.size ? start + chunkSize : file.size;
-    let params = {
-        start: start,
-        end: end,
-        id: token
-    };
-    let slice = file.slice(start, end);
-    let xhr = new XMLHttpRequest();
-    xhr.open('post', wwwRoot + "/local/chunkupload/proceedupload_ajax.php?" + $.param(params));
-    xhr.upload.onprogress = (e) => {
-        setProgress(e.loaded + start, file.size);
-    };
-    xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                let response = JSON.parse(xhr.responseText);
-                if (response.error !== undefined) {
-                    notifyError(response.error);
-                } else {
-                    if (end < file.size) {
-                        proceedUpload(file, end);
-                    }
-                }
-            }
-        }
-    };
-    xhr.onerror = () => {
-        reset();
-        // Doesn't make sense to try to fetch strings when having internet problems.
-        notification.alert("Error", "Failure while uploading!", "Ok");
-    };
-    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-    xhr.send(slice);
-}
-
-/**
- * Resets the Progress and the Filepicker name.
- */
-function reset() {
-    setProgress(0, 1);
-    filename.text("");
-}
-
-/**
- * Sets the progressbar
- * @param {int} loaded
- * @param {int} total
- */
-function setProgress(loaded, total) {
-    if (loaded === total) {
-        // Hide progressbar on finish.
-        progress.css('width', '0');
-    } else {
-        progress.css('width', loaded * 100 / total + "%");
+        };
+        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+        xhr.send(slice);
     }
-    progressicon.prop('hidden', loaded !== total);
-}
 
-/**
- * Notify error
- * @param {object|string} errorstring Either Object as accepted by get_string, or a string, to describe the error.
- */
-function notifyError(errorstring) {
-    reset();
-    if (typeof errorstring === "string") {
-        get_strings([
-            {key: 'error'},
-            {key: 'ok'},
-        ]).done(function(s) {
-                notification.alert(s[0], errorstring, s[1]);
+    /**
+     * Proceed the upload
+     * @param {File} file
+     * @param {int} start from where to proceed the upload.
+     */
+    function proceedUpload(file, start) {
+        let end = start + chunkSize < file.size ? start + chunkSize : file.size;
+        let params = {
+            start: start,
+            end: end,
+            id: token
+        };
+        let slice = file.slice(start, end);
+        let xhr = new XMLHttpRequest();
+        xhr.open('post', wwwRoot + "/local/chunkupload/proceedupload_ajax.php?" + $.param(params));
+        xhr.upload.onprogress = (e) => {
+            setProgress(e.loaded + start, file.size);
+        };
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    let response = JSON.parse(xhr.responseText);
+                    if (response.error !== undefined) {
+                        notifyError(response.error);
+                    } else {
+                        if (end < file.size) {
+                            proceedUpload(file, end);
+                        }
+                    }
+                }
             }
-        ).fail(notification.exception);
-    } else {
-        get_strings([
-            {key: 'error'},
-            errorstring,
-            {key: 'ok'},
-        ]).done(function(s) {
-                notification.alert(s[0], s[1], s[2]);
-            }
-        ).fail(notification.exception);
+        };
+        xhr.onerror = () => {
+            reset();
+            // Doesn't make sense to try to fetch strings when having internet problems.
+            notification.alert("Error", "Failure while uploading!", "Ok");
+        };
+        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+        xhr.send(slice);
+    }
+
+    /**
+     * Resets the Progress and the Filepicker name.
+     */
+    function reset() {
+        setProgress(0, 1);
+        filename.text("");
+    }
+
+    /**
+     * Sets the progressbar
+     * @param {int} loaded
+     * @param {int} total
+     */
+    function setProgress(loaded, total) {
+        if (loaded === total) {
+            // Hide progressbar on finish.
+            progress.css('width', '0');
+        } else {
+            progress.css('width', loaded * 100 / total + "%");
+        }
+        progressicon.prop('hidden', loaded !== total);
+    }
+
+    /**
+     * Notify error
+     * @param {object|string} errorstring Either Object as accepted by get_string, or a string, to describe the error.
+     */
+    function notifyError(errorstring) {
+        reset();
+        if (typeof errorstring === "string") {
+            get_strings([
+                {key: 'error'},
+                {key: 'ok'},
+            ]).done(function(s) {
+                    notification.alert(s[0], errorstring, s[1]);
+                }
+            ).fail(notification.exception);
+        } else {
+            get_strings([
+                {key: 'error'},
+                errorstring,
+                {key: 'ok'},
+            ]).done(function(s) {
+                    notification.alert(s[0], s[1], s[2]);
+                }
+            ).fail(notification.exception);
+        }
     }
 }

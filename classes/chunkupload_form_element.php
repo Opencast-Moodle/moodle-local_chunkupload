@@ -26,6 +26,7 @@ namespace local_chunkupload;
 
 global $CFG;
 
+use core_form\filetypes_util;
 use html_writer;
 use renderer_base;
 
@@ -137,9 +138,10 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
 
         // need these three to filter repositories list
         $accepted_types = $this->_options['accepted_types'] ? $this->_options['accepted_types'] : '*';
-        if (!empty($accepted_types) && $accepted_types != '*') {
+        $util = new \core_form\filetypes_util();
+        if ($accepted_types != '*') {
+            $accepted_types = $util->expand($accepted_types);
             $html .= html_writer::tag('p', get_string('filesofthesetypes', 'form'));
-            $util = new \core_form\filetypes_util();
             $filetypes = $accepted_types;
             $filetypedescriptions = $util->describe_file_types($filetypes);
             $html .= $OUTPUT->render_from_template('core_form/filetypes-descriptions', $filetypedescriptions);
@@ -177,7 +179,6 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         return $context;
     }
 
-
     /**
      * Check that the file has the allowed type.
      *
@@ -187,13 +188,13 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
     public function validateSubmitValue($value) {
         global $DB;
         if (is_null($value)) {
-            return get_string('nofile', 'error');
+            return "";
         }
         $record = $DB->get_record('local_chunkupload_files', ['id' => $value]);
-        if (!$record) {
-            return get_string('nofile', 'error');
+        if (!$record || $record->state == 0) {
+            return "";
         }
-        if ($record->state != 2) {
+        if ($record->state == 1) {
             return get_string('uploadnotfinished','local_chunkupload');
         }
         $path = self::get_path_for_id($value);
@@ -206,7 +207,8 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             return get_string('errorfiletoobig', $this->_options['maxbytes']);
         }
 
-        $accepted_types = $this->_options['accepted_types'];
+        $util = new filetypes_util();
+        $accepted_types = $util->expand($this->_options['accepted_types']);
 
         if (!((is_array($accepted_types) and in_array('*', $accepted_types)) or $accepted_types == '*')) {
             $mimetypes = array();
@@ -223,6 +225,10 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         return null;
     }
 
+    /**
+     * Creates a ID for a Chunkupload.
+     * @return int|null
+     */
     public function create_token() {
         global $DB, $PAGE, $USER;
 
@@ -232,7 +238,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         }
 
         do {
-            $id = random_string(15);
+            $id = rand(0, 10000000000);
         } while ($DB->record_exists('local_chunkupload_files', ['id' => $id]));
 
         $record = new \stdClass();
@@ -245,6 +251,10 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         return $id;
     }
 
+    /**
+     * Returns the base folder, where the files are stored.
+     * @return string
+     */
     public static function get_base_folder() {
         global $CFG;
         return "$CFG->dataroot/chunkupload/";
@@ -257,5 +267,34 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         } else {
             return null;
         }
+    }
+
+    public static function export_to_filearea($chunkuploadid, $newcontextid, $newcomponent, $newfilearea,
+            $newfilepath='/') {
+        global $DB;
+        $fs = get_file_storage();
+        $record = $DB->get_record('local_chunkupload_files', ['id' => $chunkuploadid], '*', IGNORE_MISSING);
+        if (!$record || $record->state != 2)
+            return null;
+
+        $file_record = array('contextid'=>$newcontextid, 'component'=>$newcomponent, 'filearea'=>$newfilearea, 'itemid'=>$chunkuploadid,
+                'filepath'=>$newfilepath, 'filename'=>$record->filename, 'userid' => $record->userid);
+        return $fs->create_file_from_pathname($file_record, self::get_path_for_id($chunkuploadid));
+    }
+
+    public static function is_file_uploaded($id) {
+        global $DB;
+        if (is_null($id)) {
+            return false;
+        }
+        $record = $DB->get_record('local_chunkupload_files', ['id' => $id]);
+        if (!$record) {
+            return false;
+        }
+
+        if (!$record->state == 2) {
+            return false;
+        }
+        return true;
     }
 }
