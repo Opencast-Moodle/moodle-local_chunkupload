@@ -118,6 +118,8 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
                     $filenamestring = $record->filename;
                     $showfinishedicon = true;
                 }
+            } else {
+                $value = $this->create_token();
             }
         } else {
             $value = $this->create_token();
