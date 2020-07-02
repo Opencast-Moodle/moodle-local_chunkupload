@@ -210,19 +210,13 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         }
 
         $util = new filetypes_util();
-        $accepted_types = $util->expand($this->_options['accepted_types']);
-
-        if (!((is_array($accepted_types) and in_array('*', $accepted_types)) or $accepted_types == '*')) {
-            $mimetypes = array();
-            foreach ($accepted_types as $type) {
-                $mimetypes[] = mimeinfo('type', $type);
-            }
-            $filetype = mime_content_type($path);
-            if (!in_array($filetype, $mimetypes)) {
-                unlink($path);
-                $DB->delete_records('local_chunkupload_files', ['id' => $value]);
-                return get_string('invalidfiletype', 'core_repository', $filetype);
-            }
+        $allowlist = $util->normalize_file_types($this->_options['accepted_types']);
+        $filename = $record->filename;
+        if (!$util->is_allowed_file_type($filename, $allowlist)) {
+            unlink($path);
+            $DB->delete_records('local_chunkupload_files', ['id' => $value]);
+            $filetype = substr($filename, strrpos($filename, '.'));
+            return get_string('invalidfiletype', 'core_repository', $filetype);
         }
         return null;
     }
