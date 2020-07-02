@@ -27,7 +27,7 @@ import notification from 'core/notification';
 /**
  * Init
  * @param {String} elementid string The id of the input element
- * @param {String} acceptedTypes The accepted Types
+ * @param {String|String[]} acceptedTypes The accepted Types
  * @param {int} maxBytes The maximal allowed amount of bytes
  * @param {string} wwwroot The wwwroot
  * @param {int} chunksize The chunksize in bytes
@@ -57,7 +57,7 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize) {
             fileextension = "." + splits[splits.length - 1];
         }
         if (!(acceptedTypes === '*' ||
-            (acceptedTypes instanceof Array && acceptedTypes.indexOf(fileextension) !== -1))) {
+            acceptedTypes instanceof Array && (acceptedTypes.indexOf(fileextension) !== -1) || acceptedTypes.indexOf('*') !== 1)) {
             fileinput.val(null);
             notifyError({key: 'invalidfiletype', component: 'core_repository', param: fileextension});
             return;
