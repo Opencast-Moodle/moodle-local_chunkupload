@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/chunkupload/db" VERSION="20200427" COMMENT="XMLDB file for Moodle local/chunkupload"
+<XMLDB PATH="local/chunkupload/db" VERSION="20200702" COMMENT="XMLDB file for Moodle local/chunkupload"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -12,7 +12,7 @@
         <FIELD NAME="maxlength" TYPE="int" LENGTH="15" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="state" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="0: token generated, not used; 1: file upload started; 2: file upload completed"/>
-        <FIELD NAME="filename" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="filename" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="length" TYPE="int" LENGTH="15" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="currentpos" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
