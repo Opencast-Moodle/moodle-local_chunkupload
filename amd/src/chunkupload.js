@@ -31,21 +31,23 @@ import notification from 'core/notification';
  * @param {int} maxBytes The maximal allowed amount of bytes
  * @param {string} wwwroot The wwwroot
  * @param {int} chunksize The chunksize in bytes
+ * @param {string} browsetext Text to display when no file is uploaded.
  */
-export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize) {
+export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize, browsetext) {
     let wwwRoot,
         chunkSize;
 
-    let fileinput, filename, progress, progressicon;
+    let fileinput, filename, progress, progressicon, deleteicon;
 
     let token;
 
     fileinput = $('#' + elementid + "_file");
     token = $('#' + elementid).val();
-    let parent = fileinput.next();
-    filename = parent.find('.chunkupload-filename');
-    progress = parent.find('.chunkupload-progress');
-    progressicon = parent.find('.chunkupload-icon');
+    let parentelem = fileinput.next();
+    filename = parentelem.find('.chunkupload-filename');
+    progress = parentelem.find('.chunkupload-progress');
+    progressicon = parentelem.find('.chunkupload-icon');
+    deleteicon = parentelem.next();
     wwwRoot = wwwroot;
     chunkSize = chunksize;
     fileinput.change(() => {
@@ -68,6 +70,12 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize) {
         }
         filename.text(file.name);
         startUpload(file);
+    });
+
+    deleteicon.on('click', (event) => {
+        reset();
+        filename.text(browsetext);
+        event.stopPropagation();
     });
 
     /**
@@ -169,6 +177,7 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize) {
             progress.css('width', loaded * 100 / total + "%");
         }
         progressicon.prop('hidden', loaded !== total);
+        deleteicon.prop('hidden', loaded !== total);
     }
 
     /**

@@ -133,7 +133,8 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
                 'elname' => $elname,
                 'value' => $value,
                 'filenamestring' => $filenamestring,
-                'showicon' => $showfinishedicon
+                'showicon' => $showfinishedicon,
+                'showdelete' => $showfinishedicon,
         ];
 
         $html = $OUTPUT->render_from_template('local_chunkupload/filepicker', $context);
@@ -154,7 +155,8 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
                 'acceptedTypes' => $accepted_types,
                 'maxBytes' => $this->_options['maxbytes'],
                 'wwwroot' => $CFG->wwwroot,
-                'chunksize' => get_config('local_chunkupload', 'chunksize') * 1024 * 1024
+                'chunksize' => get_config('local_chunkupload', 'chunksize') * 1024 * 1024,
+                'browsetext' => get_string('choosefile', 'mod_feedback'),
         ));
         return $html;
     }

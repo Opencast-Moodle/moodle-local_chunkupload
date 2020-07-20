@@ -28,6 +28,13 @@
     overflow: hidden;
 }
 
+.local_chunkupload .chunkupload-label .chunkupload-left .chunkupload-filename {
+    width: 70%;
+    overflow: hidden;
+    display: inline-block;
+    text-overflow: ellipsis;
+}
+
 .local_chunkupload .chunkupload-label .chunkupload-progress {
     position: absolute;
     bottom: 0;
@@ -37,4 +44,15 @@
 }
 
 .local_chunkupload .chunkupload-label .chunkupload-icon {
+    display: inline-block;
+    vertical-align: top;
     color: green;
+}
+
+.local_chunkupload .chunkupload-delete {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+    padding: .375rem;
+}
