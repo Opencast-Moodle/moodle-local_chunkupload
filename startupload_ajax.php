@@ -46,7 +46,7 @@ $record = $DB->get_record('local_chunkupload_files', ['id' => $id]);
 if (!$record) {
     $PAGE->set_context(context_system::instance());
     echo $OUTPUT->header();
-    $err->error = "No record with that id found.";
+    $err->error = get_string('tokenexpired', 'local_chunkupload');
     die(json_encode($err));
 }
 
