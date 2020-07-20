@@ -74,7 +74,14 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize, bro
 
     deleteicon.on('click', (event) => {
         reset();
+        let params = {
+            id: token
+        };
+        let xhr = new XMLHttpRequest();
+        xhr.open('post', wwwRoot + "/local/chunkupload/deleteupload_ajax.php?" + $.param(params));
+        xhr.send(null);
         filename.text(browsetext);
+        fileinput.val(null);
         event.stopPropagation();
     });
 
