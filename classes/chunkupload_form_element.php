@@ -135,6 +135,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
                 'filenamestring' => $filenamestring,
                 'showicon' => $showfinishedicon,
                 'showdelete' => $showfinishedicon,
+                'filesize' => display_size((int) $this->_options['maxbytes']),
         ];
 
         $html = $OUTPUT->render_from_template('local_chunkupload/filepicker', $context);
