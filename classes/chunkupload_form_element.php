@@ -260,16 +260,15 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
     }
 
     public static function get_path_for_id($id) {
-        global $CFG;
         if ($id) {
-            return "$CFG->dataroot/chunkupload/" . $id;
+            return self::get_base_folder() . $id;
         } else {
             return null;
         }
     }
 
     public static function export_to_filearea($chunkuploadid, $newcontextid, $newcomponent, $newfilearea,
-            $newfilepath='/') {
+                                              $newfilepath='/') {
         global $DB;
         $fs = get_file_storage();
         $record = $DB->get_record('local_chunkupload_files', ['id' => $chunkuploadid], '*', IGNORE_MISSING);
@@ -277,8 +276,30 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             return null;
 
         $file_record = array('contextid'=>$newcontextid, 'component'=>$newcomponent, 'filearea'=>$newfilearea, 'itemid'=>$chunkuploadid,
-                'filepath'=>$newfilepath, 'filename'=>$record->filename, 'userid' => $record->userid);
-        return $fs->create_file_from_pathname($file_record, self::get_path_for_id($chunkuploadid));
+            'filepath'=>$newfilepath, 'filename'=>$record->filename, 'userid' => $record->userid);
+
+        \core_php_time_limit::raise();
+
+        // Increase memory limit
+        raise_memory_limit(MEMORY_EXTRA);
+        $file = $fs->create_file_from_pathname($file_record, self::get_path_for_id($chunkuploadid));
+        reduce_memory_limit(MEMORY_STANDARD);
+
+        return $file;
+    }
+
+    /**
+     * Remove chunkupload file.
+     * @param $chunkuploadid String token of the chunkupload job.
+     * @throws \dml_exception
+     */
+    public static function delete_file($chunkuploadid) {
+        global $DB;
+        $DB->delete_records('local_chunkupload_files', array('id' => $chunkuploadid));
+        $path = chunkupload_form_element::get_path_for_id($chunkuploadid);
+        if (file_exists($path)) {
+            unlink($path);
+        }
     }
 
     public static function is_file_uploaded($id) {
