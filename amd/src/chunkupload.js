@@ -63,7 +63,7 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize, bro
             fileinput.val(null);
             notifyError({key: 'invalidfiletype', component: 'core_repository', param: fileextension});
             return;
-        } else if (file.size > maxBytes) {
+        } else if (maxBytes !== -1 && file.size > maxBytes) {
             fileinput.val(null);
             notifyError({key: 'errorpostmaxsize', component: 'core_repository'});
             return;

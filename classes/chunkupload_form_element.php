@@ -153,7 +153,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         $PAGE->requires->js_call_amd('local_chunkupload/chunkupload', 'init', array(
                 'elementid' => $id,
                 'acceptedTypes' => $accepted_types,
-                'maxBytes' => $this->_options['maxbytes'],
+                'maxBytes' => (int) $this->_options['maxbytes'],
                 'wwwroot' => $CFG->wwwroot,
                 'chunksize' => get_config('local_chunkupload', 'chunksize') * 1024 * 1024,
                 'browsetext' => get_string('choosefile', 'mod_feedback'),

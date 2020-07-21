@@ -81,7 +81,7 @@ if ($end === null) {
     die(json_encode($err));
 }
 
-if ($length > $record->maxlength) {
+if ($record->maxlength != -1 && $length > $record->maxlength) {
     $err->error = "File is too long";
     die(json_encode($err));
 }
