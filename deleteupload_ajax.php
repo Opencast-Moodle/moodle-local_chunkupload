@@ -29,10 +29,6 @@ require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/../../lib/filelib.php');
 
 $id = optional_param("id", null, PARAM_ALPHANUM);
-$start = optional_param("start", null, PARAM_INT);
-$length = optional_param("length", 0, PARAM_INT);
-$end = optional_param("end", null, PARAM_INT);
-$filename = optional_param("filename", null, PARAM_FILE);
 
 $err = new stdClass();
 if (!$id) {
@@ -66,49 +62,19 @@ if ($USER->id != $record->userid) {
     die(json_encode($err));
 }
 
-if ($length == 0) {
-    $err->error = "Must not be emtpy!";
-    die(json_encode($err));
-}
-
-if ($start === null) {
-    $err->error = "Param start is missing";
-    die(json_encode($err));
-}
-
-if ($end === null) {
-    $err->error = "Param end is missing";
-    die(json_encode($err));
-}
-
-if ($record->maxlength != -1 && $length > $record->maxlength) {
-    $err->error = "File is too long";
-    die(json_encode($err));
-}
-
-if ($end > $length) {
-    $err->error = "Chunk is longer than specified length";
-    die(json_encode($err));
-}
-
 $path = \local_chunkupload\chunkupload_form_element::get_path_for_id($id);
-$content = file_get_contents('php://input', false, null, 0, $end);
-if (strlen($content) != $end) {
-    $err->error = "Filechunk is not as long as it should be.";
-    die(json_encode($err));
-}
 
-if (!file_exists($dirpath = \local_chunkupload\chunkupload_form_element::get_base_folder())) {
-    mkdir($dirpath);
-}
-file_put_contents($path, $content);
+if (file_exists($path)) {
 
-$record->currentpos = $end;
-$record->length = $length;
-$record->lastmodified = time();
-$record->state = $end == $length ? 2 : 1;
-$record->filename = $filename;
-$DB->update_record('local_chunkupload_files', $record);
+    unlink($path);
+
+    $record->currentpos = 0;
+    $record->length = 0;
+    $record->lastmodified = time();
+    $record->state = 0;
+    $record->filename = "";
+    $DB->update_record('local_chunkupload_files', $record);
+}
 
 $response = new stdClass();
 die(json_encode($response));

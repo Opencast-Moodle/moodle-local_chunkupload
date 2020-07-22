@@ -1,4 +1,8 @@
-.custom-file-input ~ .custom-file-label.chunkupload-label {
+.local_chunkupload {
+    width: 100%;
+}
+
+.local_chunkupload .custom-file-input ~ .custom-file-label.chunkupload-label {
     padding: 0;
     border-radius: 0;
     display: flex;
@@ -7,28 +11,35 @@
     margin-bottom: 0;
 }
 
-.custom-file-input ~ .custom-file-label.chunkupload-label:after {
+.local_chunkupload .custom-file-input ~ .custom-file-label.chunkupload-label:after {
     display: none;
 }
 
-.chunkupload-label > span {
+.local_chunkupload .chunkupload-label > span {
     height: 100%;
     text-align: center;
     padding: .375rem .75rem;
 }
 
-.chunkupload-label .chunkupload-browse {
+.local_chunkupload .chunkupload-label .chunkupload-browse {
     flex: 1 1 20%;
 }
 
-.chunkupload-label .chunkupload-left {
+.local_chunkupload .chunkupload-label .chunkupload-left {
     flex: 1 1 80%;
     position: relative;
     white-space: nowrap;
     overflow: hidden;
 }
 
-.chunkupload-label .chunkupload-progress {
+.local_chunkupload .chunkupload-label .chunkupload-left .chunkupload-filename {
+    width: 70%;
+    overflow: hidden;
+    display: inline-block;
+    text-overflow: ellipsis;
+}
+
+.local_chunkupload .chunkupload-label .chunkupload-progress {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -36,6 +47,21 @@
     background: #578014;
 }
 
-.chunkupload-label .chunkupload-icon {
+.local_chunkupload .chunkupload-label .chunkupload-icon {
+    display: inline-block;
+    vertical-align: top;
     color: green;
+}
+
+.local_chunkupload .chunkupload-delete {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+    padding: .375rem;
+    cursor: pointer;
+}
+
+.local_chunkupload .chunkupload-filesize {
+    float: right;
 }

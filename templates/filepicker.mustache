@@ -19,16 +19,23 @@
 
 }}
 <input type="hidden" name="{{elname}}" id="{{elid}}" value="{{value}}" class=""/>
-<div class="custom-file">
-    <input type="file" class="custom-file-input" id="{{elid}}_file">
-    <label class="custom-file-label chunkupload-label" for="{{elid}}_file">
-        <span class="chunkupload-browse btn-secondary">{{#str}}browse, core_editor{{/str}}</span>
-        <span class="chunkupload-left">
-            <span class="chunkupload-icon" {{^showicon}}hidden{{/showicon}}>
-                {{#pix}}i/checked, core,{{/pix}}
+
+<div class="local_chunkupload">
+    <span class="chunkupload-filesize">
+        {{#str}}maxsize, local_chunkupload, {{filesize}}{{/str}}
+    </span>
+    <div class="custom-file">
+        <input type="file" class="custom-file-input" id="{{elid}}_file">
+        <label class="custom-file-label chunkupload-label" for="{{elid}}_file">
+            <span class="chunkupload-browse btn-secondary">{{#str}}browse, core_editor{{/str}}</span>
+            <span class="chunkupload-left">
+                <span class="chunkupload-icon" {{^showicon}}hidden{{/showicon}}>
+                    {{#pix}}i/checked, core,{{/pix}}
+                </span>
+                <span class="chunkupload-filename">{{filenamestring}}</span>
+                <span class="chunkupload-progress"></span>
             </span>
-            <span class="chunkupload-filename">{{filenamestring}}</span>
-            <span class="chunkupload-progress"></span>
-        </span>
-    </label>
+        </label>
+        <span class="chunkupload-delete"  {{^showdelete}}hidden{{/showdelete}}>{{#pix}}i/delete, core,{{/pix}}</span>
+    </div>
 </div>

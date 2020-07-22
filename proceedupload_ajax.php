@@ -92,7 +92,7 @@ if ($record->currentpos != $start) {
     die(json_encode($err));
 }
 
-if ($record->end > $record->length) {
+if ($end > $record->length) {
     $err->error = "Filechunk is too long and exceeds the length of the whole file.";
     die(json_encode($err));
 }

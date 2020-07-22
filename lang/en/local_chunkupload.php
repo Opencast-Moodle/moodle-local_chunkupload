@@ -31,3 +31,4 @@ $string['cleanup_task'] = 'Task to cleanup old tokens and files';
 
 $string['uploadnotfinished'] = 'Upload did not finish!';
 $string['tokenexpired'] = 'The Upload-Token has expired. Try refreshing the page to recieve a new one.';
+$string['maxsize'] = 'Maximum file size: {$a}';
