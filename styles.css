@@ -1,3 +1,7 @@
+.local_chunkupload {
+    width: 100%;
+}
+
 .local_chunkupload .custom-file-input ~ .custom-file-label.chunkupload-label {
     padding: 0;
     border-radius: 0;
