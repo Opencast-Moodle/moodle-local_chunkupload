@@ -59,7 +59,7 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize, bro
             fileextension = "." + splits[splits.length - 1];
         }
         if (!(acceptedTypes === '*' ||
-            acceptedTypes instanceof Array && (acceptedTypes.indexOf(fileextension) !== -1) || acceptedTypes.indexOf('*') !== 1)) {
+            acceptedTypes instanceof Array && (acceptedTypes.indexOf(fileextension) !== -1 || acceptedTypes.indexOf('*') !== -1))) {
             fileinput.val(null);
             notifyError({key: 'invalidfiletype', component: 'core_repository', param: fileextension});
             return;
