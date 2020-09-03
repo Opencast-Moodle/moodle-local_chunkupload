@@ -43,11 +43,11 @@ class cleanup_files extends \core\task\scheduled_task {
         global $DB;
         $config = get_config('local_chunkupload');
 
-        // State 0
+        // State 0.
         $DB->delete_records_select('local_chunkupload_files', 'state = 0 AND lastmodified < :time',
                 array('time' => time() - $config->state0duration));
 
-        // State 1
+        // State 1.
         $ids = $DB->get_fieldset_select('local_chunkupload_files', 'id',
                 'lastmodified < :time AND state = 1', array('time' => time() - $config->state1duration));
         $DB->delete_records_list('local_chunkupload_files', 'id', $ids);
@@ -58,7 +58,7 @@ class cleanup_files extends \core\task\scheduled_task {
             }
         }
 
-        // State 2
+        // State 2.
         $ids = $DB->get_fieldset_select('local_chunkupload_files', 'id',
                 'lastmodified < :time AND state = 2', array('time' => time() - $config->state2duration));
         $DB->delete_records_list('local_chunkupload_files', 'id', $ids);

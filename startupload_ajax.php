@@ -42,15 +42,15 @@ if (!$id) {
     die(json_encode($err));
 }
 
-$record = $DB->get_record('local_chunkupload_files', ['id' => $id]);
-if (!$record) {
+$filerecord = $DB->get_record('local_chunkupload_files', ['id' => $id]);
+if (!$filerecord) {
     $PAGE->set_context(context_system::instance());
     echo $OUTPUT->header();
     $err->error = get_string('tokenexpired', 'local_chunkupload');
     die(json_encode($err));
 }
 
-$context = context::instance_by_id($record->contextid, IGNORE_MISSING);
+$context = context::instance_by_id($filerecord->contextid, IGNORE_MISSING);
 if (!$context) {
     $PAGE->set_context(context_system::instance());
     echo $OUTPUT->header();
@@ -61,7 +61,7 @@ $PAGE->set_context($context);
 echo $OUTPUT->header();
 \local_chunkupload\login_helper::require_login_in_context_ajax($context);
 
-if ($USER->id != $record->userid) {
+if ($USER->id != $filerecord->userid) {
     $err->error = "Request was made by a different user!";
     die(json_encode($err));
 }
@@ -81,7 +81,7 @@ if ($end === null) {
     die(json_encode($err));
 }
 
-if ($record->maxlength != -1 && $length > $record->maxlength) {
+if ($filerecord->maxlength != -1 && $length > $filerecord->maxlength) {
     $err->error = "File is too long";
     die(json_encode($err));
 }
@@ -103,12 +103,12 @@ if (!file_exists($dirpath = \local_chunkupload\chunkupload_form_element::get_bas
 }
 file_put_contents($path, $content);
 
-$record->currentpos = $end;
-$record->length = $length;
-$record->lastmodified = time();
-$record->state = $end == $length ? 2 : 1;
-$record->filename = $filename;
-$DB->update_record('local_chunkupload_files', $record);
+$filerecord->currentpos = $end;
+$filerecord->length = $length;
+$filerecord->lastmodified = time();
+$filerecord->state = $end == $length ? 2 : 1;
+$filerecord->filename = $filename;
+$DB->update_record('local_chunkupload_files', $filerecord);
 
 $response = new stdClass();
 die(json_encode($response));

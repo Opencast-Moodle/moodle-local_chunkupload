@@ -24,11 +24,13 @@
 
 namespace local_chunkupload;
 
-global $CFG;
-
 use core_form\filetypes_util;
 use html_writer;
 use renderer_base;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 
 require_once($CFG->dirroot . '/repository/lib.php');
 require_once($CFG->dirroot . '/question/editlib.php');
@@ -52,21 +54,20 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
 
     /** @var array options provided to initalize filemanager */
     // PHP doesn't support 'key' => $value1 | $value2 in class definition
-    // We cannot do $_options = array('return_types'=> FILE_INTERNAL | FILE_REFERENCE);
-    // So I have to set null here, and do it in constructor
+    // We cannot do $_options = array('return_types'=> FILE_INTERNAL | FILE_REFERENCE);.
+    // So I have to set null here, and do it in constructor.
     protected $_options = array('maxbytes' => 0, 'accepted_types' => '*');
 
     /**
      * Constructor
      *
-     * @param string $elementName (optional) name of the filepicker
-     * @param string $elementLabel (optional) filepicker label
+     * @param string $elementname (optional) name of the filepicker
+     * @param string $elementlabel (optional) filepicker label
      * @param array $attributes (optional) Either a typical HTML attribute string
      *              or an associative array
      * @param array $options set of options to initalize filepicker
      */
-    public function __construct($elementName = null, $elementLabel = null, $attributes = null, $options = null) {
-        global $CFG, $PAGE;
+    public function __construct($elementname = null, $elementlabel = null, $attributes = null, $options = null) {
         $options = (array) $options;
         foreach ($options as $name => $value) {
             if (array_key_exists($name, $this->_options)) {
@@ -74,7 +75,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             }
         }
         $this->_type = 'filepicker';
-        parent::__construct($elementName, $elementLabel, $attributes);
+        parent::__construct($elementname, $elementlabel, $attributes);
     }
 
     /**
@@ -82,7 +83,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
      *
      * @return string html for help button
      */
-    function getHelpButton() {
+    public function gethelpbutton() {
         return $this->_helpbutton;
     }
 
@@ -91,7 +92,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
      *
      * @return string
      */
-    function getElementTemplateType() {
+    public function getelementtemplatetype() {
         if ($this->_flagFrozen) {
             return 'nodisplay';
         } else {
@@ -104,14 +105,14 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
      *
      * @return string
      */
-    function toHtml() {
+    public function tohtml() {
         global $CFG, $PAGE, $OUTPUT;
         $id = $this->_attributes['id'];
         $elname = $this->_attributes['name'];
         $showfinishedicon = false;
         $filenamestring = null;
 
-        if ($value = $this->getValue()) {
+        if ($value = $this->getvalue()) {
             global $DB;
             if ($record = $DB->get_record('local_chunkupload_files', ['id' => $value])) {
                 if ($record->state == 2) {
@@ -140,20 +141,20 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
 
         $html = $OUTPUT->render_from_template('local_chunkupload/filepicker', $context);
 
-        // need these three to filter repositories list
-        $accepted_types = $this->_options['accepted_types'] ? $this->_options['accepted_types'] : '*';
+        // Need these three to filter repositories list.
+        $acceptedtypes = $this->_options['accepted_types'] ? $this->_options['accepted_types'] : '*';
         $util = new \core_form\filetypes_util();
-        if ($accepted_types != '*') {
-            $accepted_types = $util->expand($accepted_types);
+        if ($acceptedtypes !== '*') {
+            $acceptedtypes = $util->expand($acceptedtypes);
             $html .= html_writer::tag('p', get_string('filesofthesetypes', 'form'));
-            $filetypes = $accepted_types;
+            $filetypes = $acceptedtypes;
             $filetypedescriptions = $util->describe_file_types($filetypes);
             $html .= $OUTPUT->render_from_template('core_form/filetypes-descriptions', $filetypedescriptions);
         }
 
         $PAGE->requires->js_call_amd('local_chunkupload/chunkupload', 'init', array(
                 'elementid' => $id,
-                'acceptedTypes' => $accepted_types,
+                'acceptedTypes' => $acceptedtypes,
                 'maxBytes' => (int) $this->_options['maxbytes'],
                 'wwwroot' => $CFG->wwwroot,
                 'chunksize' => get_config('local_chunkupload', 'chunksize') * 1024 * 1024,
@@ -165,12 +166,12 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
     /**
      * export uploaded file
      *
-     * @param array $submitValues values submitted.
+     * @param array $submitvalues values submitted.
      * @param bool $assoc specifies if returned array is associative
      * @return array
      */
-    function exportValue(&$submitValues, $assoc = false) {
-        $fileid = $this->_findValue($submitValues);
+    public function exportvalue(&$submitvalues, $assoc = false) {
+        $fileid = $this->_findValue($submitvalues);
         if (null === $fileid) {
             $fileid = $this->getValue();
         }
@@ -180,7 +181,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
 
     public function export_for_template(renderer_base $output) {
         $context = $this->export_for_template_base($output);
-        $context['html'] = $this->toHtml();
+        $context['html'] = $this->tohtml();
         return $context;
     }
 
@@ -190,7 +191,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
      * @param array $value Draft item id with the uploaded files.
      * @return string|null Validation error message or null.
      */
-    public function validateSubmitValue($value) {
+    public function validatesubmitvalue($value) {
         global $DB;
         if (is_null($value)) {
             return "";
@@ -200,7 +201,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             return "";
         }
         if ($record->state == 1) {
-            return get_string('uploadnotfinished','local_chunkupload');
+            return get_string('uploadnotfinished', 'local_chunkupload');
         }
         $path = self::get_path_for_id($value);
         if ($path == null || !file_exists($path)) {
@@ -272,17 +273,19 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         global $DB;
         $fs = get_file_storage();
         $record = $DB->get_record('local_chunkupload_files', ['id' => $chunkuploadid], '*', IGNORE_MISSING);
-        if (!$record || $record->state != 2)
+        if (!$record || $record->state !== 2) {
             return null;
+        }
 
-        $file_record = array('contextid'=>$newcontextid, 'component'=>$newcomponent, 'filearea'=>$newfilearea, 'itemid'=>$chunkuploadid,
-            'filepath'=>$newfilepath, 'filename'=>$record->filename, 'userid' => $record->userid);
+        $filerecord = array('contextid' => $newcontextid, 'component' => $newcomponent,
+                'filearea' => $newfilearea, 'itemid' => $chunkuploadid, 'filepath' => $newfilepath,
+                'filename' => $record->filename, 'userid' => $record->userid);
 
         \core_php_time_limit::raise();
 
-        // Increase memory limit
+        // Increase memory limit.
         raise_memory_limit(MEMORY_EXTRA);
-        $file = $fs->create_file_from_pathname($file_record, self::get_path_for_id($chunkuploadid));
+        $file = $fs->create_file_from_pathname($filerecord, self::get_path_for_id($chunkuploadid));
         reduce_memory_limit(MEMORY_STANDARD);
 
         return $file;
@@ -296,7 +299,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
     public static function delete_file($chunkuploadid) {
         global $DB;
         $DB->delete_records('local_chunkupload_files', array('id' => $chunkuploadid));
-        $path = chunkupload_form_element::get_path_for_id($chunkuploadid);
+        $path = self::get_path_for_id($chunkuploadid);
         if (file_exists($path)) {
             unlink($path);
         }

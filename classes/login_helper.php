@@ -24,8 +24,9 @@
 
 namespace local_chunkupload;
 
-
 use context;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Chunkupload Login Helper
@@ -47,7 +48,7 @@ class login_helper {
         if ($context && ($context->contextlevel == CONTEXT_COURSE)) {
             require_login($context->instanceid, false, null, false, true);
         } else if ($context && ($context->contextlevel == CONTEXT_MODULE)) {
-            if ($cm = $DB->get_record('course_modules',array('id' =>$context->instanceid))) {
+            if ($cm = $DB->get_record('course_modules', array('id' => $context->instanceid))) {
                 if (!$course = $DB->get_record('course', array('id' => $cm->course))) {
                     print_error('invalidcourseid');
                 }
