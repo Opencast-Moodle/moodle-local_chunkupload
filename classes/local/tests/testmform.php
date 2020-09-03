@@ -44,8 +44,8 @@ class testmform extends \moodleform {
                 "$CFG->dirroot/local/chunkupload/classes/chunkupload_form_element.php",
                 'local_chunkupload\chunkupload_form_element');
 
-        $mform->addElement('chunkupload', 'fileid', get_string('file'), null,
-                array('maxbytes' => 100 * 1024 * 1024, 'accepted_types' => array('.mp4')));
+        $mform->addElement('chunkupload', 'test', get_string('file'), null,
+                array('maxbytes' => 2 * 1024 * 1024, 'accepted_types' => array('.png')));
 
         $this->add_action_buttons(false, get_string('save'));
     }
