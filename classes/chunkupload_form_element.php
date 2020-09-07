@@ -52,10 +52,10 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
     /** @var string html for help button, if empty then no help will icon will be dispalyed. */
     public $_helpbutton = '';
 
-    /** @var array options provided to initalize filemanager */
     // PHP doesn't support 'key' => $value1 | $value2 in class definition
     // We cannot do $_options = array('return_types'=> FILE_INTERNAL | FILE_REFERENCE);.
     // So I have to set null here, and do it in constructor.
+    /** @var array options provided to initalize filemanager */
     protected $_options = array('maxbytes' => 0, 'accepted_types' => '*');
 
     /**
@@ -179,6 +179,11 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         return $this->_prepareValue($fileid, true);
     }
 
+    /**
+     * Exports the data for the mustache template.
+     * @param renderer_base $output The Renderer.
+     * @return array|\stdClass The Data for the template.
+     */
     public function export_for_template(renderer_base $output) {
         $context = $this->export_for_template_base($output);
         $context['html'] = $this->tohtml();
@@ -227,7 +232,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
 
     /**
      * Creates a ID for a Chunkupload.
-     * @return int|null
+     * @return int|null The chunkupload id.
      */
     public function create_token() {
         global $DB, $PAGE, $USER;
@@ -253,13 +258,18 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
 
     /**
      * Returns the base folder, where the files are stored.
-     * @return string
+     * @return string The basefolder.
      */
     public static function get_base_folder() {
         global $CFG;
         return "$CFG->dataroot/chunkupload/";
     }
 
+    /**
+     * Returns the filepath for the chunkupload with the given id.
+     * @param int $id The id.
+     * @return string|null The filepath.
+     */
     public static function get_path_for_id($id) {
         if ($id) {
             return self::get_base_folder() . $id;
@@ -268,6 +278,15 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         }
     }
 
+    /**
+     * Exports the uploaded file referenced by the $chunkuploadid to the given filearea.
+     * @param int $chunkuploadid The chunkupload id of the file to export.
+     * @param int $newcontextid The contextid for the filearea.
+     * @param string $newcomponent The component for the filearea.
+     * @param string $newfilearea The filearea where to export the file to
+     * @param string $newfilepath The filepath where to export the file to.
+     * @return \stored_file|null The file that is stored in the filearea.
+     */
     public static function export_to_filearea($chunkuploadid, $newcontextid, $newcomponent, $newfilearea,
                                               $newfilepath='/') {
         global $DB;
@@ -293,8 +312,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
 
     /**
      * Remove chunkupload file.
-     * @param $chunkuploadid String token of the chunkupload job.
-     * @throws \dml_exception
+     * @param string $chunkuploadid token of the chunkupload job.
      */
     public static function delete_file($chunkuploadid) {
         global $DB;
@@ -305,6 +323,11 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         }
     }
 
+    /**
+     * Returns whether a file is uploaded for a given chunkupload id.
+     * @param int $id the chunkupload id.
+     * @return bool whether a file was uploaded.
+     */
     public static function is_file_uploaded($id) {
         global $DB;
         if (is_null($id)) {

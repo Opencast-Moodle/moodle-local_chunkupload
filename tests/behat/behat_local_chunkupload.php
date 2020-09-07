@@ -40,9 +40,10 @@ use Behat\Gherkin\Node\TableNode as TableNode;
 class behat_local_chunkupload extends behat_base {
 
     /**
+     * Behat step to upload a file to a chunkupload.
      * @When /^I upload the "(.*)" file to the "(.*)" chunkupload$/
-     * @param $file string path to the file to upload
-     * @param $chunkupload string name of the chunkupload
+     * @param string $file path to the file to upload
+     * @param string $chunkupload name of the chunkupload
      */
     public function i_upload_the_file_to_the_chunkupload($file, $chunkupload) {
         global $CFG;

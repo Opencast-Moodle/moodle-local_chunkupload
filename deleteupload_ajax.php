@@ -18,7 +18,7 @@
 /**
  * The Web service script that is called from the filepicker front end
  *
- * @package    local_bufferupload
+ * @package    local_chunkupload
  * @copyright  2020 Justus Dieckmann
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

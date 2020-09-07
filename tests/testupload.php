@@ -14,10 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Test page used in the local_chunkupload behat tests.
+ *
+ * @package   local_chunkupload
+ * @copyright 2020 Justus Dieckmann WWU
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require_once(__DIR__ . '/../../../config.php');
 
 use local_chunkupload\chunkupload_form_element;
 use local_chunkupload\local\tests\testmform;
+
+global $PAGE, $CFG, $OUTPUT;
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/local/chunkupload/tests/testupload.php'));

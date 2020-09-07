@@ -15,12 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Upload video form.
+ * Test moodleform in the local_chunkupload behat tests.
  *
- * @package    block_opencast
- * @copyright  2017 Andreas Wagner, SYNERGY LEARNING
- * @author     Andreas Wagner
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   local_chunkupload
+ * @copyright 2020 Justus Dieckmann WWU
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_chunkupload\local\tests;
@@ -33,8 +32,18 @@ global $CFG;
 
 require_once($CFG->dirroot . '/lib/formslib.php');
 
+/**
+ * Test moodleform in the local_chunkupload behat tests.
+ *
+ * @package   local_chunkupload
+ * @copyright 2020 Justus Dieckmann WWU
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class testmform extends \moodleform {
 
+    /**
+     * Definition of testmform.
+     */
     public function definition() {
         global $CFG;
 
