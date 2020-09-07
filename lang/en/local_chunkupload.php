@@ -22,13 +22,13 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Chunkupload';
-$string['setting:chunksize'] = 'Chunksize (MB)';
+$string['pluginname'] = 'Chunk upload';
+$string['setting:chunksize'] = 'Chunk size (MB)';
 $string['setting:state0duration'] = 'Duration until unused token is deleted';
-$string['setting:state1duration'] = 'Duration until uncompleted fileupload is deleted';
-$string['setting:state2duration'] = 'Duration until completed fileupload is deleted';
-$string['cleanup_task'] = 'Task to cleanup old tokens and files';
+$string['setting:state1duration'] = 'Duration until uncompleted file upload is deleted';
+$string['setting:state2duration'] = 'Duration until completed file upload is deleted';
+$string['cleanup_task'] = 'Task to clean up old tokens and files';
 
 $string['uploadnotfinished'] = 'Upload did not finish!';
-$string['tokenexpired'] = 'The Upload-Token has expired. Try refreshing the page to recieve a new one.';
+$string['tokenexpired'] = 'The upload token has expired. Try refreshing the page to recieve a new one.';
 $string['maxsize'] = 'Maximum file size: {$a}';
