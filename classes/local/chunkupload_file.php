@@ -14,19 +14,39 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Entityclass for chunkupload file.
+ *
+ * @package   local_chunkupload
+ * @copyright 2020 Tobias Reischmann WWU
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_chunkupload\local;
 
 use local_chunkupload\chunkupload_form_element;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Entityclass for chunkupload file.
+ *
+ * @package   local_chunkupload
+ * @copyright 2020 Tobias Reischmann WWU
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class chunkupload_file {
 
-    /** @var Token of the chunkupload_file */
+    /** @var int Token of the chunkupload_file */
     private $token;
 
+    /** @var string Filename of the chunkupload_file*/
     private $filename;
 
+    /**
+     * Chunkupload file constructor.
+     * @param int $token token (id) of the chunkupload.
+     */
     public function __construct($token) {
         global $DB;
         $record = $DB->get_record('local_chunkupload_files', array('id' => $token));
@@ -37,6 +57,11 @@ class chunkupload_file {
         $this->filename = $record->filename;
     }
 
+    /**
+     * Add file to curl request
+     * @param \stdClass $curlrequest the curl request.
+     * @param string $key the key for which to add the file.
+     */
     public function add_to_curl_request(&$curlrequest, $key) {
         $curlrequest->_tmp_file_post_params[$key] = \curl_file_create($this->get_fullpath(), null, $this->get_filename());
     }

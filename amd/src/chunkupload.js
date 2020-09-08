@@ -21,7 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 import $ from 'jquery';
-import {get_strings} from 'core/str';
+import {get_strings as getStrings} from 'core/str';
 import notification from 'core/notification';
 
 /**
@@ -189,12 +189,12 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize, bro
 
     /**
      * Notify error
-     * @param {object|string} errorstring Either Object as accepted by get_string, or a string, to describe the error.
+     * @param {object|string} errorstring Either Object as accepted by getString, or a string, to describe the error.
      */
     function notifyError(errorstring) {
         reset();
         if (typeof errorstring === "string") {
-            get_strings([
+            getStrings([
                 {key: 'error'},
                 {key: 'ok'},
             ]).done(function(s) {
@@ -202,7 +202,7 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize, bro
                 }
             ).fail(notification.exception);
         } else {
-            get_strings([
+            getStrings([
                 {key: 'error'},
                 errorstring,
                 {key: 'ok'},

@@ -35,10 +35,18 @@ use local_chunkupload\chunkupload_form_element;
  */
 class cleanup_files extends \core\task\scheduled_task {
 
+    /**
+     * Returns the name of the cron task
+     * @return string
+     */
     public function get_name() {
         return get_string('cleanup_task', 'local_chunkupload');
     }
 
+    /**
+     * Cron task defintion.
+     * Cleans up old chunkupload files and records.
+     */
     public function execute() {
         global $DB;
         $config = get_config('local_chunkupload');

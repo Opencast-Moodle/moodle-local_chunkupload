@@ -40,7 +40,7 @@ class login_helper {
     /**
      * Requires a user to be logged in in that context.
      * Like /question/editlib.php:require_login_in_context(), but suitable for ajax.
-     * @param $context context the context
+     * @param context $context the context
      */
     public static function require_login_in_context_ajax($context) {
         global $DB;
