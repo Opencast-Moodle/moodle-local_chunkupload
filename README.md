@@ -1,4 +1,4 @@
-Chunkupload moodleform-element (moodle-local_chunkupload)
+Chunk upload moodleform-element (moodle-local_chunkupload)
 =====================
 
 This plugin offers a new form element for moodle forms.
