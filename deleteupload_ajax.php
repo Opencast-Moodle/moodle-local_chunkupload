@@ -71,7 +71,7 @@ if (file_exists($path)) {
     $record->currentpos = 0;
     $record->length = 0;
     $record->lastmodified = time();
-    $record->state = 0;
+    $record->state = \local_chunkupload\state_type::UNUSED_TOKEN_GENERATED;
     $record->filename = "";
     $DB->update_record('local_chunkupload_files', $record);
 }

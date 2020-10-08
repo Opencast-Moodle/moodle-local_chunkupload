@@ -115,7 +115,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         if ($value = $this->getvalue()) {
             global $DB;
             if ($record = $DB->get_record('local_chunkupload_files', ['id' => $value])) {
-                if ($record->state == 2) {
+                if ($record->state == state_type::UPLOAD_COMPLETED) {
                     $filenamestring = $record->filename;
                     $showfinishedicon = true;
                 }
@@ -202,10 +202,10 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             return "";
         }
         $record = $DB->get_record('local_chunkupload_files', ['id' => $value]);
-        if (!$record || $record->state == 0) {
+        if (!$record || $record->state == state_type::UNUSED_TOKEN_GENERATED) {
             return "";
         }
-        if ($record->state == 1) {
+        if ($record->state == state_type::UPLOAD_STARTED) {
             return get_string('uploadnotfinished', 'local_chunkupload');
         }
         $path = self::get_path_for_id($value);
@@ -292,7 +292,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         global $DB;
         $fs = get_file_storage();
         $record = $DB->get_record('local_chunkupload_files', ['id' => $chunkuploadid], '*', IGNORE_MISSING);
-        if (!$record || $record->state !== 2) {
+        if (!$record || $record->state !== state_type::UPLOAD_COMPLETED) {
             return null;
         }
 
@@ -338,7 +338,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             return false;
         }
 
-        if (!$record->state == 2) {
+        if (!$record->state == state_type::UPLOAD_COMPLETED) {
             return false;
         }
         return true;

@@ -106,7 +106,7 @@ file_put_contents($path, $content);
 $filerecord->currentpos = $end;
 $filerecord->length = $length;
 $filerecord->lastmodified = time();
-$filerecord->state = $end == $length ? 2 : 1;
+$filerecord->state = $end == $length ? \local_chunkupload\state_type::UPLOAD_COMPLETED : \local_chunkupload\state_type::UPLOAD_STARTED;
 $filerecord->filename = $filename;
 $DB->update_record('local_chunkupload_files', $filerecord);
 
