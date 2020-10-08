@@ -237,7 +237,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
     public function create_token() {
         global $DB, $PAGE, $USER;
 
-        if ($USER->id == 0) {
+        if (isguestuser()) {
             // Ensure guests can't upload.
             return null;
         }
