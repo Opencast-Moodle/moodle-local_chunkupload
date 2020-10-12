@@ -59,7 +59,7 @@ if (!$context) {
 }
 $PAGE->set_context($context);
 echo $OUTPUT->header();
-\local_chunkupload\login_helper::require_login_in_context_ajax($context);
+require_login();
 
 if ($USER->id != $filerecord->userid) {
     $err->error = "Request was made by a different user!";
