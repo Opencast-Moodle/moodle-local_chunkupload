@@ -32,7 +32,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class state_type {
 
-    /** @var string Represents the type for a step subplugin. 0: token generated, not used; 1: file upload started; 2: file upload completed */
+    /** @var string Represents the type for a step subplugin. 0: token generated, not used; 1: file upload started;
+     * 2: file upload completed
+     */
     const UNUSED_TOKEN_GENERATED = 0;
     /** @var string Represents the type for a trigger subplugin. */
     const UPLOAD_STARTED = 1;

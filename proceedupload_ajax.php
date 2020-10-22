@@ -113,7 +113,8 @@ if (strlen($content) != $end - $start) {
 
 file_put_contents($path, $content, FILE_APPEND);
 
-$record->state = $end == $record->length ? \local_chunkupload\state_type::UPLOAD_COMPLETED : \local_chunkupload\state_type::UPLOAD_STARTED;
+$record->state = $end == $record->length ? \local_chunkupload\state_type::UPLOAD_COMPLETED :
+    \local_chunkupload\state_type::UPLOAD_STARTED;
 $record->currentpos = $end;
 $record->lastmodified = time();
 
