@@ -25,6 +25,7 @@
 namespace local_chunkupload\task;
 
 use local_chunkupload\chunkupload_form_element;
+use local_chunkupload\state_type;
 
 /**
  * Chunkupload Cleanup Task
@@ -51,13 +52,14 @@ class cleanup_files extends \core\task\scheduled_task {
         global $DB;
         $config = get_config('local_chunkupload');
 
-        // State 0.
-        $DB->delete_records_select('local_chunkupload_files', 'state = 0 AND lastmodified < :time',
-                array('time' => time() - $config->state0duration));
+        // State UNUSED_TOKEN_GENERATED 0.
+        $DB->delete_records_select('local_chunkupload_files', 'state = :state AND lastmodified < :time',
+                array('time' => time() - $config->state0duration, 'state' => state_type::UNUSED_TOKEN_GENERATED));
 
-        // State 1.
+        // State UPLOAD_STARTED 1.
         $ids = $DB->get_fieldset_select('local_chunkupload_files', 'id',
-                'lastmodified < :time AND state = 1', array('time' => time() - $config->state1duration));
+                'lastmodified < :time AND state = :state', array('time' => time() - $config->state1duration,
+                'state' => state_type::UPLOAD_STARTED));
         $DB->delete_records_list('local_chunkupload_files', 'id', $ids);
         foreach ($ids as $id) {
             $path = chunkupload_form_element::get_path_for_id($id);
@@ -66,9 +68,10 @@ class cleanup_files extends \core\task\scheduled_task {
             }
         }
 
-        // State 2.
+        // State UPLOAD_COMPLETED 2.
         $ids = $DB->get_fieldset_select('local_chunkupload_files', 'id',
-                'lastmodified < :time AND state = 2', array('time' => time() - $config->state2duration));
+                'lastmodified < :time AND state = :state', array('time' => time() - $config->state2duration,
+                'state' => state_type::UPLOAD_COMPLETED));
         $DB->delete_records_list('local_chunkupload_files', 'id', $ids);
         foreach ($ids as $id) {
             $path = chunkupload_form_element::get_path_for_id($id);
