@@ -61,6 +61,11 @@ jobs:
     - stage: develop
       php: 7.4
       env: DB=mysqli MOODLE_BRANCH=MOODLE_310_STABLE
+  exclude:
+    - php: 7.2
+      env: DB=mysqli MOODLE_BRANCH=master
+    - php: 7.2
+      env: DB=pgsql MOODLE_BRANCH=master
 
 # Unit tests and behat tests against full matrix.
 install:
