@@ -212,7 +212,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         if ($path == null || !file_exists($path)) {
             return get_string('nofile', 'error');
         }
-        if ($this->_options['maxbytes'] != -1 && filesize($path) > $this->_options['maxbytes']) {
+        if ($this->_options['maxbytes'] !== -1 && filesize($path) > $this->_options['maxbytes']) {
             unlink($path);
             $DB->delete_records('local_chunkupload_files', ['id' => $value]);
             return get_string('errorfiletoobig', 'moodle', $this->_options['maxbytes']);
