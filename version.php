@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020090700;      // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2021051400;      // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2019052000;      // Requires this Moodle version
 $plugin->component = 'local_chunkupload'; // Full name of the plugin (used for diagnostics).
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'v3.9-r2'; // First release for Moodle 3.9.
+$plugin->release   = 'v3.11-r1'; // First release for Moodle 3.11.
