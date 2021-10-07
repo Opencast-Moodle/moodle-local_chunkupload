@@ -44,11 +44,6 @@ $mform->addElement('chunkupload', 'video_chunk', get_string('myvideo', 'myplugin
 
 The form element takes in two parameters, which can specify the maximum upload size (`maxbytes`) and the accepted filetypes (`accepted_types`). 
 
-System requirements
-------------------
-
-* Min. Moodle Version: 3.8
-
 ## License ##
 
 This plugin is developed in cooperation with the TU Ilmenau and the WWU Münster.
