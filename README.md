@@ -47,7 +47,7 @@ The form element takes in two parameters, which can specify the maximum upload s
 System requirements
 ------------------
 
-* Min. Moodle Version: 3.7
+* Min. Moodle Version: 3.8
 
 ## License ##
 
