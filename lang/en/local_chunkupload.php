@@ -29,6 +29,7 @@ $string['setting:state1duration'] = 'Duration until uncompleted file upload is d
 $string['setting:state2duration'] = 'Duration until completed file upload is deleted';
 $string['cleanup_task'] = 'Task to clean up old tokens and files';
 
+$string['uploaded'] = 'File uploaded';
 $string['uploadnotfinished'] = 'Upload did not finish!';
 $string['tokenexpired'] = 'The upload token has expired. Try refreshing the page to recieve a new one.';
 $string['maxsize'] = 'Maximum file size: {$a}';
