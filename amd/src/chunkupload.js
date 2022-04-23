@@ -16,7 +16,7 @@
 /**
  * Manage the upload in chunks.
  *
- * @module    local_chunkupload
+ * @module     local_chunkupload/chunkupload
  * @copyright  2020 Justus Dieckmann WWU
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
