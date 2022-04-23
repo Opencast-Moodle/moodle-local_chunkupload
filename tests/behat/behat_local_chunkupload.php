@@ -50,6 +50,4 @@ class behat_local_chunkupload extends behat_base {
         $fileelement = $this->find_file('id_' . $chunkupload. '_file');
         $fileelement->attachFile($CFG->dirroot . '/' . $file);
     }
-
-
 }

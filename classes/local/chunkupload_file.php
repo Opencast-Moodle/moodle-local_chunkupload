@@ -26,8 +26,6 @@ namespace local_chunkupload\local;
 
 use local_chunkupload\chunkupload_form_element;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Entityclass for chunkupload file.
  *
@@ -96,5 +94,4 @@ class chunkupload_file {
     public function readfile() {
         return file_get_contents($this->get_fullpath());
     }
-
 }
