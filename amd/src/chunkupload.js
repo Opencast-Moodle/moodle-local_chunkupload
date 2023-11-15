@@ -16,7 +16,7 @@
 /**
  * Manage the upload in chunks.
  *
- * @package    local_chunkupload
+ * @module    local_chunkupload
  * @copyright  2020 Justus Dieckmann WWU
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -56,7 +56,7 @@ export function init(elementid, acceptedTypes, maxBytes, wwwroot, chunksize, bro
         let fileextension = ".";
         if (file.name.indexOf(".") !== -1) {
             let splits = file.name.split(".");
-            fileextension = "." + splits[splits.length - 1];
+            fileextension = "." + splits[splits.length - 1].toLowerCase();
         }
         if (!(acceptedTypes === '*' ||
             acceptedTypes instanceof Array && (acceptedTypes.indexOf(fileextension) !== -1 || acceptedTypes.indexOf('*') !== -1))) {
