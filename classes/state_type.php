@@ -22,8 +22,6 @@
  */
 namespace local_chunkupload;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Defines available state_types.
  * @package    local_chunkupload

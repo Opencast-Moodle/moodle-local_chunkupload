@@ -26,14 +26,14 @@ defined('MOODLE_INTERNAL') || die();
 
 /* List of handlers */
 
-$tasks = array(
-    array(
+$tasks = [
+    [
         'classname' => 'local_chunkupload\task\cleanup_files',
         'blocking' => 0,
         'minute' => 'R',
         'hour' => '*',
         'day' => '*',
         'dayofweek' => '*',
-        'month' => '*'
-    ),
-);
+        'month' => '*',
+    ],
+];

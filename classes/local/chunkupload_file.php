@@ -26,8 +26,6 @@ namespace local_chunkupload\local;
 
 use local_chunkupload\chunkupload_form_element;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Entityclass for chunkupload file.
  *
@@ -49,7 +47,7 @@ class chunkupload_file {
      */
     public function __construct($token) {
         global $DB;
-        $record = $DB->get_record('local_chunkupload_files', array('id' => $token));
+        $record = $DB->get_record('local_chunkupload_files', ['id' => $token]);
         if (!$record) {
             throw new \moodle_exception("Chunkupload file does not exist");
         }

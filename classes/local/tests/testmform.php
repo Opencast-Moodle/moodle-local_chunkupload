@@ -54,7 +54,7 @@ class testmform extends \moodleform {
                 'local_chunkupload\chunkupload_form_element');
 
         $mform->addElement('chunkupload', 'test', get_string('file'), null,
-                array('maxbytes' => 2 * 1024 * 1024, 'accepted_types' => array('.png')));
+                ['maxbytes' => 2 * 1024 * 1024, 'accepted_types' => ['.png']]);
 
         $this->add_action_buttons(false, get_string('save'));
     }
