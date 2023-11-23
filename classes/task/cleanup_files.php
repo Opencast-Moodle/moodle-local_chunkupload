@@ -54,12 +54,12 @@ class cleanup_files extends \core\task\scheduled_task {
 
         // State UNUSED_TOKEN_GENERATED 0.
         $DB->delete_records_select('local_chunkupload_files', 'state = :state AND lastmodified < :time',
-                array('time' => time() - $config->state0duration, 'state' => state_type::UNUSED_TOKEN_GENERATED));
+                ['time' => time() - $config->state0duration, 'state' => state_type::UNUSED_TOKEN_GENERATED]);
 
         // State UPLOAD_STARTED 1.
         $ids = $DB->get_fieldset_select('local_chunkupload_files', 'id',
-                'lastmodified < :time AND state = :state', array('time' => time() - $config->state1duration,
-                'state' => state_type::UPLOAD_STARTED));
+                'lastmodified < :time AND state = :state', ['time' => time() - $config->state1duration,
+                'state' => state_type::UPLOAD_STARTED, ]);
         $DB->delete_records_list('local_chunkupload_files', 'id', $ids);
         foreach ($ids as $id) {
             $path = chunkupload_form_element::get_path_for_id($id);
@@ -70,8 +70,8 @@ class cleanup_files extends \core\task\scheduled_task {
 
         // State UPLOAD_COMPLETED 2.
         $ids = $DB->get_fieldset_select('local_chunkupload_files', 'id',
-                'lastmodified < :time AND state = :state', array('time' => time() - $config->state2duration,
-                'state' => state_type::UPLOAD_COMPLETED));
+                'lastmodified < :time AND state = :state', ['time' => time() - $config->state2duration,
+                'state' => state_type::UPLOAD_COMPLETED, ]);
         $DB->delete_records_list('local_chunkupload_files', 'id', $ids);
         foreach ($ids as $id) {
             $path = chunkupload_form_element::get_path_for_id($id);

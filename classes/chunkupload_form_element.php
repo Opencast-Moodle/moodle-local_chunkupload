@@ -56,7 +56,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
     // We cannot do $_options = array('return_types'=> FILE_INTERNAL | FILE_REFERENCE);.
     // So I have to set null here, and do it in constructor.
     /** @var array options provided to initalize filemanager */
-    protected $_options = array('maxbytes' => 0, 'accepted_types' => '*');
+    protected $_options = ['maxbytes' => 0, 'accepted_types' => '*'];
 
     /**
      * Constructor
@@ -152,14 +152,14 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             $html .= $OUTPUT->render_from_template('core_form/filetypes-descriptions', $filetypedescriptions);
         }
 
-        $PAGE->requires->js_call_amd('local_chunkupload/chunkupload', 'init', array(
+        $PAGE->requires->js_call_amd('local_chunkupload/chunkupload', 'init', [
                 'elementid' => $id,
                 'acceptedTypes' => $acceptedtypes,
                 'maxBytes' => (int) $this->_options['maxbytes'],
                 'wwwroot' => $CFG->wwwroot,
                 'chunksize' => get_config('local_chunkupload', 'chunksize') * 1024 * 1024,
                 'browsetext' => get_string('choosefile', 'mod_feedback'),
-        ));
+        ]);
         return $html;
     }
 
@@ -296,9 +296,9 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             return null;
         }
 
-        $filerecord = array('contextid' => $newcontextid, 'component' => $newcomponent,
+        $filerecord = ['contextid' => $newcontextid, 'component' => $newcomponent,
                 'filearea' => $newfilearea, 'itemid' => $chunkuploadid, 'filepath' => $newfilepath,
-                'filename' => $record->filename, 'userid' => $record->userid);
+                'filename' => $record->filename, 'userid' => $record->userid, ];
 
         \core_php_time_limit::raise();
 
@@ -316,7 +316,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
      */
     public static function delete_file($chunkuploadid) {
         global $DB;
-        $DB->delete_records('local_chunkupload_files', array('id' => $chunkuploadid));
+        $DB->delete_records('local_chunkupload_files', ['id' => $chunkuploadid]);
         $path = self::get_path_for_id($chunkuploadid);
         if (file_exists($path)) {
             unlink($path);
