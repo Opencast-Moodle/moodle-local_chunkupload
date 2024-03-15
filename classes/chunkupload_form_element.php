@@ -292,7 +292,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         global $DB;
         $fs = get_file_storage();
         $record = $DB->get_record('local_chunkupload_files', ['id' => $chunkuploadid], '*', IGNORE_MISSING);
-        if (!$record || $record->state !== state_type::UPLOAD_COMPLETED) {
+        if (!$record || $record->state != state_type::UPLOAD_COMPLETED) {
             return null;
         }
 
