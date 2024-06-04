@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_chunkupload';
-$plugin->release = 'v4.3-r1';
+$plugin->release = 'v4.4-r1';
 $plugin->version = 2024060400;
-$plugin->requires = 2020061524; // Requires Moodle 3.9+.
+$plugin->requires = 2022112800; // Requires Moodle 4.1+.
 $plugin->maturity = MATURITY_STABLE;
