@@ -1,5 +1,18 @@
-Chunk upload moodleform-element (moodle-local_chunkupload)
-=====================
+# moodle-local_chunkupload - Chunk upload moodleform element #
+
+This plugin offers a new form element for moodle forms to upload one file as multiple chunks.
+
+This file is part of the mod_opencast plugin for Moodle - <http://moodle.org/>
+
+*Maintainer:*   Thomas Niedermaier (Universität Münster), Farbod Zamani (Elan e.V.)
+
+*Copyright:* 2024 Thomas Niedermaier, UNIVERSITÄT MÜNSTER
+
+*License:*   [GNU GPL v3 or later](http://www.gnu.org/copyleft/gpl.html)
+
+
+Description
+-----------
 
 This plugin offers a new form element for moodle forms.
 The form element is a file upload field, which uploads one file as multiple small chunks.
@@ -20,12 +33,16 @@ Picture of the chunkupload while uploading a file.
 Installation
 ------------
 
-To install the plugin you have to place the content of this repository into local/chunkupload.
+* Copy the module code directly to the local/chunkupload directory.
 
-`git clone https://github.com/learnweb/moodle-local_chunkupload.git local/chunkupload.`
- 
-Usage
------
+* Log into Moodle as administrator.
+
+* Open the administration area (http://your-moodle-site/admin) to start the installation
+  automatically.
+
+
+Usage in your plugin
+--------------------
 
 To use the form element within one of your plugins, you first have to register the form element as a quickform element:
 
@@ -42,7 +59,31 @@ $mform->addElement('chunkupload', 'video_chunk', get_string('myvideo', 'myplugin
         array('maxbytes' => $maxuploadsize, 'accepted_types' => $videotypes));
 ```
 
-The form element takes in two parameters, which can specify the maximum upload size (`maxbytes`) and the accepted filetypes (`accepted_types`). 
+The form element takes in two parameters, which can specify the maximum upload size (`maxbytes`) and the accepted filetypes (`accepted_types`).
+
+
+Admin Settings
+--------------
+
+View the documentation of the plugin settings ("additional features") [here](https://moodle.docs.opencast.org/#block/additional_features/).
+
+
+## Documentation ##
+
+The full documentation of the plugin can be found [here](https://moodle.docs.opencast.org/#chunkupload/about/).
+
+
+Bug Reports / Support
+---------------------
+
+We try our best to deliver bug-free plugins, but we can not test the plugin for every platform,
+database, PHP and Moodle version. If you find any bug please report it on
+[GitHub](https://github.com/Opencast-Moodle/moodle-local_chunkupload/issues). Please
+provide a detailed bug description, including the plugin and Moodle version and, if applicable, a
+screenshot.
+
+You may also file a request for enhancement on GitHub.
+
 
 ## License ##
 
