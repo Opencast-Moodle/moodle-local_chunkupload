@@ -33,21 +33,25 @@
 }
 
 .local_chunkupload .chunkupload-label .chunkupload-left .chunkupload-filename {
-    width: 70%;
+    width: 100%;
     overflow: hidden;
     display: inline-block;
     text-overflow: ellipsis;
+    position: absolute;
+    left: 0;
 }
 
 .local_chunkupload .chunkupload-label .chunkupload-progress {
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 6px;
-    background: #578014;
+    height: 100%;
+    background: #71A81A;
 }
 
 .local_chunkupload .chunkupload-label .chunkupload-icon {
+    position: absolute;
+    left: 8px;
     display: inline-block;
     vertical-align: top;
     color: green;
