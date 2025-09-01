@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+5.0.1 (2025-09-01)
+------------------
+* Change progressbar style
+
+
 5.0.0 (2025-08-01)
 ------------------
 * Moodle 5.0 compatible version
