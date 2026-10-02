@@ -301,11 +301,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             return false;
         }
         $record = $DB->get_record('local_chunkupload_files', ['id' => $id]);
-        if (!$record) {
-            return false;
-        }
-
-        if (!$record->state == state_type::UPLOAD_COMPLETED) {
+        if (!$record || $record->state != state_type::UPLOAD_COMPLETED) {
             return false;
         }
         return true;
