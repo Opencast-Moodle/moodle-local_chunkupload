@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot . '/repository/lib.php');
-require_once($CFG->dirroot . '/question/editlib.php');
 require_once($CFG->libdir . "/pear/HTML/QuickForm/button.php");
 require_once($CFG->libdir . '/form/templatable_form_element.php');
 
@@ -276,43 +275,6 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         } else {
             return null;
         }
-    }
-
-    /**
-     * Exports the uploaded file referenced by the $chunkuploadid to the given filearea.
-     * @param int $chunkuploadid The chunkupload id of the file to export.
-     * @param int $newcontextid The contextid for the filearea.
-     * @param string $newcomponent The component for the filearea.
-     * @param string $newfilearea The filearea where to export the file to
-     * @param string $newfilepath The filepath where to export the file to.
-     * @return \stored_file|null The file that is stored in the filearea.
-     */
-    public static function export_to_filearea(
-        $chunkuploadid,
-        $newcontextid,
-        $newcomponent,
-        $newfilearea,
-        $newfilepath = '/'
-    ) {
-        global $DB;
-        $fs = get_file_storage();
-        $record = $DB->get_record('local_chunkupload_files', ['id' => $chunkuploadid], '*', IGNORE_MISSING);
-        if (!$record || $record->state !== state_type::UPLOAD_COMPLETED) {
-            return null;
-        }
-
-        $filerecord = ['contextid' => $newcontextid, 'component' => $newcomponent,
-                'filearea' => $newfilearea, 'itemid' => $chunkuploadid, 'filepath' => $newfilepath,
-                'filename' => $record->filename, 'userid' => $record->userid, ];
-
-        \core_php_time_limit::raise();
-
-        // Increase memory limit.
-        raise_memory_limit(MEMORY_EXTRA);
-        $file = $fs->create_file_from_pathname($filerecord, self::get_path_for_id($chunkuploadid));
-        reduce_memory_limit(MEMORY_STANDARD);
-
-        return $file;
     }
 
     /**
