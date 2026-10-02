@@ -34,10 +34,10 @@
     <span class="chunkupload-filesize">
         {{#str}}maxsize, local_chunkupload, {{filesize}}{{/str}}
     </span>
-    <div class="custom-file">
-        <input type="file" class="custom-file-input" id="{{elid}}_file">
-        <label class="custom-file-label chunkupload-label" for="{{elid}}_file">
-            <span class="chunkupload-browse btn-secondary">{{#str}}browse, core_editor{{/str}}</span>
+    <div class="chunkupload-file">
+        <input type="file" class="chunkupload-input" id="{{elid}}_file">
+        <label class="form-control chunkupload-label" for="{{elid}}_file">
+            <span class="chunkupload-browse btn btn-secondary">{{#str}}browse, core_editor{{/str}}</span>
             <span class="chunkupload-left">
                 <span class="chunkupload-icon" {{^showicon}}hidden{{/showicon}}>
                     {{#pix}}i/checked, core,{{#str}} uploaded, local_chunkupload {{/str}}{{/pix}}

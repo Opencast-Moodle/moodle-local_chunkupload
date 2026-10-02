@@ -40,7 +40,6 @@ require_once($CFG->dirroot . '/lib/formslib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testmform extends \moodleform {
-
     /**
      * Definition of testmform.
      */
@@ -49,12 +48,19 @@ class testmform extends \moodleform {
 
         $mform = $this->_form;
 
-        MoodleQuickForm::registerElementType('chunkupload',
-                "$CFG->dirroot/local/chunkupload/classes/chunkupload_form_element.php",
-                'local_chunkupload\chunkupload_form_element');
+        MoodleQuickForm::registerElementType(
+            'chunkupload',
+            "$CFG->dirroot/local/chunkupload/classes/chunkupload_form_element.php",
+            'local_chunkupload\chunkupload_form_element'
+        );
 
-        $mform->addElement('chunkupload', 'test', get_string('file'), null,
-                ['maxbytes' => 2 * 1024 * 1024, 'accepted_types' => ['.png']]);
+        $mform->addElement(
+            'chunkupload',
+            'test',
+            get_string('file'),
+            null,
+            ['maxbytes' => 2 * 1024 * 1024, 'accepted_types' => ['.png']]
+        );
 
         $this->add_action_buttons(false, get_string('save'));
     }

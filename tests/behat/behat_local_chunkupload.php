@@ -27,7 +27,7 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use Behat\Gherkin\Node\TableNode as TableNode;
+use Behat\Gherkin\Node\TableNode;
 
 /**
  * Steps definitions related with the local_chunkupload plugin.
@@ -38,7 +38,6 @@ use Behat\Gherkin\Node\TableNode as TableNode;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_local_chunkupload extends behat_base {
-
     /**
      * Behat step to upload a file to a chunkupload.
      * @When /^I upload the "(.*)" file to the "(.*)" chunkupload$/
@@ -47,9 +46,7 @@ class behat_local_chunkupload extends behat_base {
      */
     public function i_upload_the_file_to_the_chunkupload($file, $chunkupload) {
         global $CFG;
-        $fileelement = $this->find_file('id_' . $chunkupload. '_file');
+        $fileelement = $this->find_file('id_' . $chunkupload . '_file');
         $fileelement->attachFile($CFG->dirroot . '/' . $file);
     }
-
-
 }

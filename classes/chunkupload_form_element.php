@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot . '/repository/lib.php');
-require_once($CFG->dirroot . '/question/editlib.php');
 require_once($CFG->libdir . "/pear/HTML/QuickForm/button.php");
 require_once($CFG->libdir . '/form/templatable_form_element.php');
 
@@ -53,10 +52,10 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
     public $_helpbutton = '';
 
     // PHP doesn't support 'key' => $value1 | $value2 in class definition
-    // We cannot do $_options = array('return_types'=> FILE_INTERNAL | FILE_REFERENCE);.
+    // We cannot do $options = array('return_types'=> FILE_INTERNAL | FILE_REFERENCE);.
     // So I have to set null here, and do it in constructor.
     /** @var array options provided to initalize filemanager */
-    protected $_options = ['maxbytes' => 0, 'accepted_types' => '*'];
+    protected $options = ['maxbytes' => 0, 'accepted_types' => '*'];
 
     /**
      * Constructor
@@ -70,8 +69,8 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
     public function __construct($elementname = null, $elementlabel = null, $attributes = null, $options = null) {
         $options = (array) $options;
         foreach ($options as $name => $value) {
-            if (array_key_exists($name, $this->_options)) {
-                $this->_options[$name] = $value;
+            if (array_key_exists($name, $this->options)) {
+                $this->options[$name] = $value;
             }
         }
         $this->_type = 'filepicker';
@@ -136,13 +135,13 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
                 'filenamestring' => $filenamestring,
                 'showicon' => $showfinishedicon,
                 'showdelete' => $showfinishedicon,
-                'filesize' => display_size((int) $this->_options['maxbytes']),
+                'filesize' => display_size((int) $this->options['maxbytes']),
         ];
 
         $html = $OUTPUT->render_from_template('local_chunkupload/filepicker', $context);
 
         // Need these three to filter repositories list.
-        $acceptedtypes = $this->_options['accepted_types'] ? $this->_options['accepted_types'] : '*';
+        $acceptedtypes = $this->options['accepted_types'] ? $this->options['accepted_types'] : '*';
         $util = new \core_form\filetypes_util();
         if ($acceptedtypes !== '*') {
             $acceptedtypes = $util->expand($acceptedtypes);
@@ -155,7 +154,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         $PAGE->requires->js_call_amd('local_chunkupload/chunkupload', 'init', [
                 'elementid' => $id,
                 'acceptedTypes' => $acceptedtypes,
-                'maxBytes' => (int) $this->_options['maxbytes'],
+                'maxBytes' => (int) $this->options['maxbytes'],
                 'wwwroot' => $CFG->wwwroot,
                 'chunksize' => get_config('local_chunkupload', 'chunksize') * 1024 * 1024,
                 'browsetext' => get_string('choosefile', 'mod_feedback'),
@@ -212,14 +211,14 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         if ($path == null || !file_exists($path)) {
             return get_string('nofile', 'error');
         }
-        if ($this->_options['maxbytes'] !== -1 && filesize($path) > $this->_options['maxbytes']) {
+        if ($this->options['maxbytes'] !== -1 && filesize($path) > $this->options['maxbytes']) {
             unlink($path);
             $DB->delete_records('local_chunkupload_files', ['id' => $value]);
-            return get_string('errorfiletoobig', 'moodle', $this->_options['maxbytes']);
+            return get_string('errorfiletoobig', 'moodle', $this->options['maxbytes']);
         }
 
         $util = new filetypes_util();
-        $allowlist = $util->normalize_file_types($this->_options['accepted_types']);
+        $allowlist = $util->normalize_file_types($this->options['accepted_types']);
         $filename = $record->filename;
         if (!$util->is_allowed_file_type($filename, $allowlist)) {
             unlink($path);
@@ -250,7 +249,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
         $record->id = $id;
         $record->userid = $USER->id;
         $record->contextid = $PAGE->context->id;
-        $record->maxlength = $this->_options['maxbytes'];
+        $record->maxlength = $this->options['maxbytes'];
         $record->lastmodified = time();
         $DB->insert_record_raw('local_chunkupload_files', $record, false, false, true);
         return $id;
@@ -279,38 +278,6 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
     }
 
     /**
-     * Exports the uploaded file referenced by the $chunkuploadid to the given filearea.
-     * @param int $chunkuploadid The chunkupload id of the file to export.
-     * @param int $newcontextid The contextid for the filearea.
-     * @param string $newcomponent The component for the filearea.
-     * @param string $newfilearea The filearea where to export the file to
-     * @param string $newfilepath The filepath where to export the file to.
-     * @return \stored_file|null The file that is stored in the filearea.
-     */
-    public static function export_to_filearea($chunkuploadid, $newcontextid, $newcomponent, $newfilearea,
-                                              $newfilepath='/') {
-        global $DB;
-        $fs = get_file_storage();
-        $record = $DB->get_record('local_chunkupload_files', ['id' => $chunkuploadid], '*', IGNORE_MISSING);
-        if (!$record || $record->state !== state_type::UPLOAD_COMPLETED) {
-            return null;
-        }
-
-        $filerecord = ['contextid' => $newcontextid, 'component' => $newcomponent,
-                'filearea' => $newfilearea, 'itemid' => $chunkuploadid, 'filepath' => $newfilepath,
-                'filename' => $record->filename, 'userid' => $record->userid, ];
-
-        \core_php_time_limit::raise();
-
-        // Increase memory limit.
-        raise_memory_limit(MEMORY_EXTRA);
-        $file = $fs->create_file_from_pathname($filerecord, self::get_path_for_id($chunkuploadid));
-        reduce_memory_limit(MEMORY_STANDARD);
-
-        return $file;
-    }
-
-    /**
      * Remove chunkupload file.
      * @param string $chunkuploadid token of the chunkupload job.
      */
@@ -334,11 +301,7 @@ class chunkupload_form_element extends \HTML_QuickForm_input implements \templat
             return false;
         }
         $record = $DB->get_record('local_chunkupload_files', ['id' => $id]);
-        if (!$record) {
-            return false;
-        }
-
-        if (!$record->state == state_type::UPLOAD_COMPLETED) {
+        if (!$record || $record->state != state_type::UPLOAD_COMPLETED) {
             return false;
         }
         return true;
