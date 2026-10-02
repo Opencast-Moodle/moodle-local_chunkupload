@@ -29,7 +29,6 @@ namespace local_chunkupload;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class state_type {
-
     /** @var string Represents the type for a step subplugin. 0: token generated, not used; 1: file upload started;
      * 2: file upload completed
      */
@@ -38,5 +37,4 @@ class state_type {
     const UPLOAD_STARTED = 1;
     /** @var string Represents the type for a trigger subplugin. */
     const UPLOAD_COMPLETED = 2;
-
 }

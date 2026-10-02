@@ -34,7 +34,6 @@ use local_chunkupload\chunkupload_form_element;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class chunkupload_file {
-
     /** @var int Token of the chunkupload_file */
     private $token;
 
@@ -94,5 +93,4 @@ class chunkupload_file {
     public function readfile() {
         return file_get_contents($this->get_fullpath());
     }
-
 }

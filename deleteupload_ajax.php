@@ -63,7 +63,6 @@ if ($USER->id != $record->userid) {
 $path = \local_chunkupload\chunkupload_form_element::get_path_for_id($id);
 
 if (file_exists($path)) {
-
     unlink($path);
 
     $record->currentpos = 0;
